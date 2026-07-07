@@ -40,7 +40,7 @@
     min-height:100vh;
   }
   .container{max-width:1280px;margin:0 auto;padding:0 24px}
-  header{padding:48px 0 32px;border-bottom:1px solid var(--border);margin-bottom:32px}
+  header{padding:48px 0 32px;border-bottom:1px solid var(--border);margin-bottom:0}
   header h1{
     font-size:36px;font-weight:800;letter-spacing:-0.02em;
     background:linear-gradient(135deg, var(--nv), var(--accent));
@@ -85,6 +85,9 @@
     font-family:'JetBrains Mono',monospace;font-size:12px;transition:all 0.2s;
   }
   #reset-btn:hover{border-color:var(--red);color:var(--red)}
+
+  /* FIXED LAYOUT: wrap tabs + phases in one container */
+  .main-wrap{max-width:1280px;margin:0 auto;padding:0 24px}
   .tabs{
     background:var(--panel);border:1px solid var(--border);
     border-radius:10px 10px 0 0;display:flex;flex-wrap:wrap;gap:4px;
@@ -107,6 +110,7 @@
   }
   .phase.active{display:block;animation:fadeIn 0.3s ease}
   @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
   .phase-header{margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid var(--border)}
   .phase-header h2{font-size:24px;font-weight:700;margin-bottom:8px}
   .phase-header p{color:var(--muted);font-size:14px;max-width:780px}
@@ -149,6 +153,7 @@
   }
   .done{opacity:0.5}
   .done b, .done a, .done .exp{text-decoration:line-through}
+
   .resource-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
   .resource-card{
     background:var(--panel-2);border:1px solid var(--border);
@@ -166,6 +171,7 @@
     font-family:'JetBrains Mono',monospace;font-size:12px;align-self:flex-start;
   }
   .resource-card a:hover{color:var(--nv)}
+
   .project-card{
     background:var(--panel-2);border:1px solid var(--border);
     border-radius:10px;padding:24px;margin-bottom:16px;
@@ -178,13 +184,14 @@
   .project-card h3{font-size:20px;margin-bottom:8px;color:var(--nv)}
   .project-card .desc{color:var(--muted);font-size:14px;margin-bottom:14px}
   .project-card .deliverables{font-size:13px;color:var(--text);margin-bottom:8px;font-weight:600}
-  .project-card .deliverables + ul, .project-card ul{font-size:13px;color:var(--text);margin-left:20px}
-  .project-card .deliverables-list li{margin-bottom:4px}
+  .project-card ul{font-size:13px;color:var(--text);margin-left:20px}
+  .project-card ul li{margin-bottom:4px}
   .project-card .proj-check{
     display:flex;align-items:center;gap:10px;margin-top:16px;
     padding-top:16px;border-top:1px solid var(--border);
   }
   .project-card .proj-check input{accent-color:var(--nv);width:18px;height:18px;cursor:pointer}
+
   .routine-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px}
   .routine-card{
     background:var(--panel-2);border:1px solid var(--border);
@@ -198,15 +205,20 @@
   .routine-slot:last-child{border-bottom:none}
   .routine-slot .time{font-family:'JetBrains Mono',monospace;color:var(--accent);white-space:nowrap}
   .routine-slot .activity{flex:1}
+
   .habit-item{
     display:flex;align-items:flex-start;gap:12px;
     padding:12px 14px;background:var(--panel-2);
     border:1px solid var(--border);border-radius:8px;margin-bottom:8px;cursor:pointer;
+    transition:all 0.2s;
   }
   .habit-item:hover{border-color:var(--nv-dim)}
   .habit-item input{margin-top:3px;accent-color:var(--nv);width:18px;height:18px;cursor:pointer}
   .habit-item .habit-text{flex:1;font-size:14px}
   .habit-item .habit-text .why{display:block;color:var(--muted);font-size:12px;margin-top:2px}
+  .habit-item.done{opacity:0.5}
+  .habit-item.done .habit-text{text-decoration:line-through}
+
   .lp-section{margin-bottom:32px}
   .lp-section h3{
     font-size:18px;margin-bottom:14px;padding-bottom:8px;
@@ -216,6 +228,7 @@
     display:flex;align-items:flex-start;gap:12px;padding:14px;
     background:var(--panel-2);border:1px solid var(--border);
     border-radius:8px;margin-bottom:8px;cursor:pointer;
+    transition:all 0.2s;
   }
   .lp-item:hover{border-color:var(--nv-dim)}
   .lp-item input{margin-top:3px;accent-color:var(--nv);width:18px;height:18px;cursor:pointer}
@@ -226,6 +239,9 @@
     color:var(--accent);font-size:12px;margin-top:6px;
     font-family:'JetBrains Mono',monospace;display:block;
   }
+  .lp-item.done{opacity:0.5}
+  .lp-item.done .lp-content{text-decoration:line-through}
+
   footer{
     text-align:center;padding:40px 0 24px;color:var(--muted);
     font-size:13px;border-top:1px solid var(--border);margin-top:48px;
@@ -235,7 +251,8 @@
     .phase{padding:20px}
     .routine-grid{grid-template-columns:1fr}
     .tab{font-size:12px;padding:8px 12px}
-    .container{padding:0 16px}
+    .container,.main-wrap{padding:0 12px}
+    .resource-grid{grid-template-columns:1fr}
   }
 </style>
 </head>
@@ -255,24 +272,26 @@
       </div>
       <div class="progress-text">
         <span id="progress-count">0 / 168 days completed</span>
-        <button id="reset-btn" onclick="resetAll()">Reset progress</button>
+        <button id="reset-btn">Reset progress</button>
       </div>
     </div>
   </div>
 </header>
 
-<nav class="tabs container">
-  <button class="tab active" onclick="showPhase(0)">🔵 Phase 1 · Foundations</button>
-  <button class="tab" onclick="showPhase(1)">🟣 Phase 2 · Core Skills</button>
-  <button class="tab" onclick="showPhase(2)">🟠 Phase 3 · Applied Eng</button>
-  <button class="tab" onclick="showPhase(3)">🔴 Phase 4 · Capstone</button>
-  <button class="tab" onclick="showPhase(4)">📚 Resources</button>
-  <button class="tab" onclick="showPhase(5)">🚀 Projects</button>
-  <button class="tab" onclick="showPhase(6)">⏰ Routine</button>
-  <button class="tab" onclick="showPhase(7)">🧠 Learning Path</button>
+<!-- FIXED: tabs and phases in the SAME wrapper -->
+<div class="main-wrap">
+<nav class="tabs">
+  <button class="tab active" data-phase="0">🔵 Phase 1 · Foundations</button>
+  <button class="tab" data-phase="1">🟣 Phase 2 · Core Skills</button>
+  <button class="tab" data-phase="2">🟠 Phase 3 · Applied Eng</button>
+  <button class="tab" data-phase="3">🔴 Phase 4 · Capstone</button>
+  <button class="tab" data-phase="4">📚 Resources</button>
+  <button class="tab" data-phase="5">🚀 Projects</button>
+  <button class="tab" data-phase="6">⏰ Routine</button>
+  <button class="tab" data-phase="7">🧠 Learning Path</button>
 </nav>
 
-<main class="container">
+<main>
 
 <!-- ============ PHASE 1: FOUNDATIONS ============ -->
 <div class="phase active" id="phase-0">
@@ -288,68 +307,68 @@
 
   <div class="week-group">
     <div class="week-title">Week 1 · Linux & CLI Foundations</div>
-    <label class="day-item"><input type="checkbox" data-key="d1"><div class="day-content"><b>D1</b> <a href="https://linuxjourney.com/lesson/getting-started-with-the-cli" target="_blank">Linux Journey — Getting Started with the CLI</a><span class="exp">Install Kali Linux in VirtualBox. Learn pwd, ls, cd, mkdir, rm, cp, mv. Spend 30 min exploring the filesystem tree.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d2"><div class="day-content"><b>D2</b> <a href="https://overthewire.org/wargames/bandit/bandit0.html" target="_blank">OverTheWire Bandit — Levels 0 to 4</a><span class="exp">SSH into the wargame. Each level teaches a Linux skill (cat, find, grep, base64). Solve all 5 levels.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d3"><div class="day-content"><b>D3</b> <a href="https://www.youtube.com/@NetworkChuck" target="_blank">NetworkChuck — Linux for Hackers (Ep 1–3)</a><span class="exp">Watch the first three videos in his Linux for Hackers playlist. Take handwritten notes on every command he demos.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d4"><div class="day-content"><b>D4</b> <a href="https://linuxjourney.com/lesson/file-permissions" target="_blank">Linux Journey — File Permissions & Ownership</a><span class="exp">Master chmod, chown, umask. Understand rwx for user/group/other. Set up a shared folder and experiment with permission bits.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d5"><div class="day-content"><b>D5</b> <a href="https://overthewire.org/wargames/bandit/bandit5.html" target="_blank">OverTheWire Bandit — Levels 5 to 9</a><span class="exp">Learn find with -size, -type, -exec. Decode base64, ROT13, hex. These are the same skills used in CTFs.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d6"><div class="day-content"><b>D6</b> <a href="https://neetcode.io/practice?tab=neetcode150" target="_blank">NeetCode — Arrays & Hashing (Easy)</a><span class="exp">Solve: Contains Duplicate, Valid Anagram, Two Sum. Spend no more than 25 min per problem before looking at the solution.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d7"><div class="day-content"><b>D7</b> <a href="https://www.kali.org/get-kali/" target="_blank">Review: Set up Kali VM properly</a><span class="exp">Install VirtualBox Guest Additions, take a snapshot, configure shared folders. Write a 1-page cheat sheet of every command you learned this week.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d1"><div class="day-content"><b>D1</b> <a href="https://linuxjourney.com/lesson/getting-started-with-the-cli" target="_blank">Linux Journey — Getting Started with the CLI</a><span class="exp">Install Kali Linux in VirtualBox. Learn pwd, ls, cd, mkdir, rm, cp, mv. Spend 30 min exploring the filesystem tree.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d2"><div class="day-content"><b>D2</b> <a href="https://overthewire.org/wargames/bandit/bandit0.html" target="_blank">OverTheWire Bandit — Levels 0 to 4</a><span class="exp">SSH into the wargame. Each level teaches a Linux skill (cat, find, grep, base64). Solve all 5 levels.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d3"><div class="day-content"><b>D3</b> <a href="https://www.youtube.com/watch?v=0LEz2CDRJto" target="_blank">NetworkChuck — Linux for Hackers (Ep 1)</a><span class="exp">Watch the first video in his Linux for Hackers playlist. Take handwritten notes on every command he demos.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d4"><div class="day-content"><b>D4</b> <a href="https://linuxjourney.com/lesson/file-permissions" target="_blank">Linux Journey — File Permissions & Ownership</a><span class="exp">Master chmod, chown, umask. Understand rwx for user/group/other. Set up a shared folder and experiment with permission bits.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d5"><div class="day-content"><b>D5</b> <a href="https://overthewire.org/wargames/bandit/bandit5.html" target="_blank">OverTheWire Bandit — Levels 5 to 9</a><span class="exp">Learn find with -size, -type, -exec. Decode base64, ROT13, hex. These are the same skills used in CTFs.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d6"><div class="day-content"><b>D6</b> <a href="https://neetcode.io/practice?tab=neetcode150" target="_blank">NeetCode — Arrays & Hashing (Easy)</a><span class="exp">Solve: Contains Duplicate, Valid Anagram, Two Sum. Spend no more than 25 min per problem before looking at the solution.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d7"><div class="day-content"><b>D7</b> <a href="https://www.kali.org/get-kali/" target="_blank">Review: Set up Kali VM properly</a><span class="exp">Install VirtualBox Guest Additions, take a snapshot, configure shared folders. Write a 1-page cheat sheet of every command you learned this week.</span></div></label>
   </div>
 
   <div class="week-group">
     <div class="week-title">Week 2 · Bash Scripting & Process Management</div>
-    <label class="day-item"><input type="checkbox" data-key="d8"><div class="day-content"><b>D8</b> <a href="https://linuxjourney.com/lesson/bash-scripting" target="_blank">Linux Journey — Bash Scripting Basics</a><span class="exp">Write your first script: a system info collector that prints hostname, kernel, uptime, and logged-in users.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d9"><div class="day-content"><b>D9</b> <a href="https://ryanstutorials.net/bash-scripting-tutorial/" target="_blank">Ryan's Tutorials — Bash Scripting</a><span class="exp">Read sections on variables, if/else, for/while loops, and functions. Write a script that backs up a directory to /tmp with a timestamp.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d10"><div class="day-content"><b>D10</b> <a href="https://overthewire.org/wargames/bandit/bandit10.html" target="_blank">OverTheWire Bandit — Levels 10 to 14</a><span class="exp">Practice sort, uniq, strings, grep. These are how you parse files during real engagements.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d11"><div class="day-content"><b>D11</b> <a href="https://linuxjourney.com/lesson/process-management" target="_blank">Linux Journey — Process Management</a><span class="exp">Master ps, top, kill, jobs, fg, bg, nohup. Understand signals (SIGTERM vs SIGKILL). Practice backgrounding long tasks.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d12"><div class="day-content"><b>D12</b> <a href="https://neetcode.io/practice?tab=neetcode150" target="_blank">NeetCode — Two Pointers</a><span class="exp">Solve Valid Palindrome, Two Sum II, 3Sum. Draw the pointer movement on paper before coding.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d13"><div class="day-content"><b>D13</b> <a href="https://neetcode.io/practice?tab=neetcode150" target="_blank">NeetCode — Sliding Window</a><span class="exp">Solve Best Time to Buy/Sell Stock, Longest Substring Without Repeating. Recognize the window-shrink pattern.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d14"><div class="day-content"><b>D14</b> <a href="https://www.gnu.org/software/bash/manual/bash.html" target="_blank">Review: Build an enumeration bash script</a><span class="exp">Write recon.sh — a script that runs whoami, id, ifconfig, ps aux, and netstat, and saves everything to a log file. Commit it to GitHub.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d8"><div class="day-content"><b>D8</b> <a href="https://linuxjourney.com/lesson/bash-scripting" target="_blank">Linux Journey — Bash Scripting Basics</a><span class="exp">Write your first script: a system info collector that prints hostname, kernel, uptime, and logged-in users.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d9"><div class="day-content"><b>D9</b> <a href="https://ryanstutorials.net/bash-scripting-tutorial/" target="_blank">Ryan's Tutorials — Bash Scripting</a><span class="exp">Read sections on variables, if/else, for/while loops, and functions. Write a script that backs up a directory to /tmp with a timestamp.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d10"><div class="day-content"><b>D10</b> <a href="https://overthewire.org/wargames/bandit/bandit10.html" target="_blank">OverTheWire Bandit — Levels 10 to 14</a><span class="exp">Practice sort, uniq, strings, grep. These are how you parse files during real engagements.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d11"><div class="day-content"><b>D11</b> <a href="https://linuxjourney.com/lesson/process-management" target="_blank">Linux Journey — Process Management</a><span class="exp">Master ps, top, kill, jobs, fg, bg, nohup. Understand signals (SIGTERM vs SIGKILL). Practice backgrounding long tasks.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d12"><div class="day-content"><b>D12</b> <a href="https://neetcode.io/practice?tab=neetcode150" target="_blank">NeetCode — Two Pointers</a><span class="exp">Solve Valid Palindrome, Two Sum II, 3Sum. Draw the pointer movement on paper before coding.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d13"><div class="day-content"><b>D13</b> <a href="https://neetcode.io/practice?tab=neetcode150" target="_blank">NeetCode — Sliding Window</a><span class="exp">Solve Best Time to Buy/Sell Stock, Longest Substring Without Repeating. Recognize the window-shrink pattern.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d14"><div class="day-content"><b>D14</b> <a href="https://www.gnu.org/software/bash/manual/bash.html" target="_blank">Review: Build an enumeration bash script</a><span class="exp">Write recon.sh — a script that runs whoami, id, ifconfig, ps aux, and netstat, and saves everything to a log file. Commit it to GitHub.</span></div></label>
   </div>
 
   <div class="week-group">
     <div class="week-title">Week 3 · Networking Fundamentals</div>
-    <label class="day-item"><input type="checkbox" data-key="d15"><div class="day-content"><b>D15</b> <a href="https://www.youtube.com/watch?v=vv4y_uOneC0" target="_blank">PowerCert — OSI Model Explained</a><span class="exp">Memorize all 7 layers and example protocols for each. Draw the OSI stack from memory 5 times.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d16"><div class="day-content"><b>D16</b> <a href="https://www.youtube.com/@NetworkChuck" target="_blank">NetworkChuck — Networking Basics playlist</a><span class="exp">Watch his videos on IP addresses, subnet masks, and default gateways. Compute subnets by hand for /24, /26, /28.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d17"><div class="day-content"><b>D17</b> <a href="https://www.professormesser.com/network-plus/n10-008/n10-008-training-course/" target="_blank">Professor Messer — Network+ (IP Addressing)</a><span class="exp">Watch the IPv4 and IPv6 modules. Subnet a 192.168.1.0/24 into 4 equal subnets and document host ranges.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d18"><div class="day-content"><b>D18</b> <a href="https://www.youtube.com/watch?v=27r4Bzuj5NQ" target="_blank">PowerCert — DNS Explained</a><span class="exp">Understand recursive vs authoritative DNS, A/AAAA/CNAME/MX/TXT records. Use dig and nslookup on real domains.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d19"><div class="day-content"><b>D19</b> <a href="https://www.youtube.com/watch?v=PpsEaqQjcfE" target="_blank">PowerCert — TCP/IP and the 3-Way Handshake</a><span class="exp">Compare TCP vs UDP. Capture the handshake in Wireshark while browsing to a new site.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d20"><div class="day-content"><b>D20</b> <a href="https://neetcode.io/practice?tab=neetcode150" target="_blank">NeetCode — Stack</a><span class="exp">Solve Valid Parentheses, Min Stack, Evaluate Reverse Polish Notation. Stack = LIFO, the recursion backbone.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d21"><div class="day-content"><b>D21</b> <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Overview" target="_blank">Review: HTTP Protocol Overview (MDN)</a><span class="exp">Map every protocol you learned this week onto the OSI model. Use curl -v to inspect a real HTTP request and response.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d15"><div class="day-content"><b>D15</b> <a href="https://www.youtube.com/watch?v=vv4y_uOneC0" target="_blank">PowerCert — OSI Model Explained</a><span class="exp">Memorize all 7 layers and example protocols for each. Draw the OSI stack from memory 5 times.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d16"><div class="day-content"><b>D16</b> <a href="https://www.youtube.com/watch?v=_YeoqVqEn1M" target="_blank">NetworkChuck — Networking Basics (Free CCNA Day 1)</a><span class="exp">Watch his intro to networking. Understand IP addresses, subnet masks, and default gateways. Compute subnets by hand for /24, /26, /28.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d17"><div class="day-content"><b>D17</b> <a href="https://www.professormesser.com/network-plus/n10-008/n10-008-training-course/" target="_blank">Professor Messer — Network+ (IP Addressing)</a><span class="exp">Watch the IPv4 and IPv6 modules. Subnet a 192.168.1.0/24 into 4 equal subnets and document host ranges.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d18"><div class="day-content"><b>D18</b> <a href="https://www.youtube.com/watch?v=27r4Bzuj5NQ" target="_blank">PowerCert — DNS Explained</a><span class="exp">Understand recursive vs authoritative DNS, A/AAAA/CNAME/MX/TXT records. Use dig and nslookup on real domains.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d19"><div class="day-content"><b>D19</b> <a href="https://www.youtube.com/watch?v=PpsEaqQjcfE" target="_blank">PowerCert — TCP/IP and the 3-Way Handshake</a><span class="exp">Compare TCP vs UDP. Capture the handshake in Wireshark while browsing to a new site.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d20"><div class="day-content"><b>D20</b> <a href="https://neetcode.io/practice?tab=neetcode150" target="_blank">NeetCode — Stack</a><span class="exp">Solve Valid Parentheses, Min Stack, Evaluate Reverse Polish Notation. Stack = LIFO, the recursion backbone.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d21"><div class="day-content"><b>D21</b> <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Overview" target="_blank">Review: HTTP Protocol Overview (MDN)</a><span class="exp">Map every protocol you learned this week onto the OSI model. Use curl -v to inspect a real HTTP request and response.</span></div></label>
   </div>
 
   <div class="week-group">
     <div class="week-title">Week 4 · Networking Tools & Packet Analysis</div>
-    <label class="day-item"><input type="checkbox" data-key="22"><div class="day-content"><b>D22</b> <a href="https://www.wireshark.org/docs/wsug_html_chunked/" target="_blank">Wireshark — User Guide (Getting Started)</a><span class="exp">Capture 5 min of your own traffic. Filter by http, dns, tcp.port==443. Identify at least 3 distinct protocols in the capture.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d23"><div class="day-content"><b>D23</b> <a href="https://nmap.org/book/man.html" target="_blank">Nmap — Reference Guide</a><span class="exp">Run nmap -sS, -sV, -O, -A against scanme.nmap.org (with permission). Document the difference between each scan type.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d24"><div class="day-content"><b>D24</b> <a href="https://www.tcpdump.org/manpages/tcpdump.1.html" target="_blank">tcpdump — Man Page & Common Filters</a><span class="exp">Capture traffic on your interface with tcpdump -i eth0 -w capture.pcap. Read it back with -r and apply filters.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d25"><div class="day-content"><b>D25</b> <a href="https://www.youtube.com/@JohnHammond010" target="_blank">John Hammond — Netcat Tutorials</a><span class="exp">Set up a netcat listener and a netcat reverse shell between two VMs. Practice file transfer with nc.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d26"><div class="day-content"><b>D26</b> <a href="https://neetcode.io/practice?tab=neetcode150" target="_blank">NeetCode — Binary Search</a><span class="exp">Solve Binary Search, Search a 2D Matrix, Koko Eating Bananas. Recognize when a problem is monotonic.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d27"><div class="day-content"><b>D27</b> <a href="https://neetcode.io/practice?tab=neetcode150" target="_blank">NeetCode — Linked List</a><span class="exp">Solve Reverse Linked List, Merge Two Sorted Lists, Linked List Cycle. Pointer manipulation is foundational.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d28"><div class="day-content"><b>D28</b> <a href="https://wiki.wireshark.org/SampleCaptures" target="_blank">Review: Analyze Wireshark Sample Captures</a><span class="exp">Download 3 sample PCAPs (HTTP, DNS, TLS). Write a report identifying all protocols, hosts, and any anomalies in each.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d22"><div class="day-content"><b>D22</b> <a href="https://www.wireshark.org/docs/wsug_html_chunked/" target="_blank">Wireshark — User Guide (Getting Started)</a><span class="exp">Capture 5 min of your own traffic. Filter by http, dns, tcp.port==443. Identify at least 3 distinct protocols in the capture.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d23"><div class="day-content"><b>D23</b> <a href="https://nmap.org/book/man.html" target="_blank">Nmap — Reference Guide</a><span class="exp">Run nmap -sS, -sV, -O, -A against scanme.nmap.org (with permission). Document the difference between each scan type.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d24"><div class="day-content"><b>D24</b> <a href="https://www.tcpdump.org/manpages/tcpdump.1.html" target="_blank">tcpdump — Man Page & Common Filters</a><span class="exp">Capture traffic on your interface with tcpdump -i eth0 -w capture.pcap. Read it back with -r and apply filters.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d25"><div class="day-content"><b>D25</b> <a href="https://www.youtube.com/watch?v=bL4NZ36OcEo" target="_blank">John Hammond — Netcat Tutorial</a><span class="exp">Set up a netcat listener and a netcat reverse shell between two VMs. Practice file transfer with nc.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d26"><div class="day-content"><b>D26</b> <a href="https://neetcode.io/practice?tab=neetcode150" target="_blank">NeetCode — Binary Search</a><span class="exp">Solve Binary Search, Search a 2D Matrix, Koko Eating Bananas. Recognize when a problem is monotonic.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d27"><div class="day-content"><b>D27</b> <a href="https://neetcode.io/practice?tab=neetcode150" target="_blank">NeetCode — Linked List</a><span class="exp">Solve Reverse Linked List, Merge Two Sorted Lists, Linked List Cycle. Pointer manipulation is foundational.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d28"><div class="day-content"><b>D28</b> <a href="https://wiki.wireshark.org/SampleCaptures" target="_blank">Review: Analyze Wireshark Sample Captures</a><span class="exp">Download 3 sample PCAPs (HTTP, DNS, TLS). Write a report identifying all protocols, hosts, and any anomalies in each.</span></div></label>
   </div>
 
   <div class="week-group">
     <div class="week-title">Week 5 · Python for Security</div>
-    <label class="day-item"><input type="checkbox" data-key="d29"><div class="day-content"><b>D29</b> <a href="https://www.youtube.com/playlist?list=PL-osiE80TeTskrapNHbz6oNtA39zEnnM_" target="_blank">Corey Schafer — Python Setup & First Program</a><span class="exp">Install Python 3, set up a venv, write hello world. Configure VS Code with the Python extension and Black formatter.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d30"><div class="day-content"><b>D30</b> <a href="https://www.youtube.com/playlist?list=PL-osiE80TeTskrapNHbz6oNtA39zEnnM_" target="_blank">Corey Schafer — Variables & Data Types</a><span class="exp">Master strings, ints, floats, lists, dicts, sets. Write a script that parses a log file and counts unique IPs.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d31"><div class="day-content"><b>D31</b> <a href="https://www.youtube.com/playlist?list=PL-osiE80TeTskrapNHbz6oNtA39zEnnM_" target="_blank">Corey Schafer — Lists, Tuples, Dictionaries</a><span class="exp">Build a script that reads /etc/passwd and produces a dictionary mapping usernames to UIDs.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d32"><div class="day-content"><b>D32</b> <a href="https://www.youtube.com/playlist?list=PL-osiE80TeTskrapNHbz6oNtA39zEnnM_" target="_blank">Corey Schafer — Functions & Scope</a><span class="exp">Refactor your log parser into functions with type hints and docstrings. Add argparse for CLI flags.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d33"><div class="day-content"><b>D33</b> <a href="https://www.youtube.com/playlist?list=PL-osiE80TeTskrapNHbz6oNtA39zEnnM_" target="_blank">Corey Schafer — Object-Oriented Programming</a><span class="exp">Build a Port class and a Host class that owns ports. This pattern is how every scanner is structured.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d34"><div class="day-content"><b>D34</b> <a href="https://neetcode.io/practice?tab=neetcode150" target="_blank">NeetCode — Trees</a><span class="exp">Solve Invert Binary Tree, Maximum Depth, Level Order Traversal. Practice recursive thinking.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d35"><div class="day-content"><b>D35</b> <a href="https://docs.python.org/3/tutorial/index.html" target="_blank">Review: Build a CLI tool with argparse</a><span class="exp">Combine everything into a single CLI tool that takes a filename and a flag (--count, --top, --unique) and reports stats.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d29"><div class="day-content"><b>D29</b> <a href="https://www.youtube.com/watch?v=YYXdXT2lqgk&list=PL-osiE80TeTskrapNHbz6oNtA39zEnnM_" target="_blank">Corey Schafer — Python Setup & First Program</a><span class="exp">Install Python 3, set up a venv, write hello world. Configure VS Code with the Python extension and Black formatter.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d30"><div class="day-content"><b>D30</b> <a href="https://www.youtube.com/watch?v=khKv-8q7YmY" target="_blank">Corey Schafer — Variables & Data Types</a><span class="exp">Master strings, ints, floats, lists, dicts, sets. Write a script that parses a log file and counts unique IPs.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d31"><div class="day-content"><b>D31</b> <a href="https://www.youtube.com/watch?v=WksfSU2q8aw" target="_blank">Corey Schafer — Lists, Tuples, Dictionaries</a><span class="exp">Build a script that reads /etc/passwd and produces a dictionary mapping usernames to UIDs.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d32"><div class="day-content"><b>D32</b> <a href="https://www.youtube.com/watch?v=9Os0o3wzS_I" target="_blank">Corey Schafer — Functions & Scope</a><span class="exp">Refactor your log parser into functions with type hints and docstrings. Add argparse for CLI flags.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d33"><div class="day-content"><b>D33</b> <a href="https://www.youtube.com/watch?v=JeznW_7DlB0" target="_blank">Corey Schafer — Object-Oriented Programming</a><span class="exp">Build a Port class and a Host class that owns ports. This pattern is how every scanner is structured.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d34"><div class="day-content"><b>D34</b> <a href="https://neetcode.io/practice?tab=neetcode150" target="_blank">NeetCode — Trees</a><span class="exp">Solve Invert Binary Tree, Maximum Depth, Level Order Traversal. Practice recursive thinking.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d35"><div class="day-content"><b>D35</b> <a href="https://docs.python.org/3/tutorial/index.html" target="_blank">Review: Build a CLI tool with argparse</a><span class="exp">Combine everything into a single CLI tool that takes a filename and a flag (--count, --top, --unique) and reports stats.</span></div></label>
   </div>
 
   <div class="week-group">
     <div class="week-title">Week 6 · Python Security Tools + Git</div>
-    <label class="day-item"><input type="checkbox" data-key="d36"><div class="day-content"><b>D36</b> <a href="https://docs.python-requests.org/en/latest/" target="_blank">Python — Requests Library Docs</a><span class="exp">Build a script that fetches a URL, extracts all links with regex, and saves status codes. This is the start of a web fuzzer.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d37"><div class="day-content"><b>D37</b> <a href="https://docs.python.org/3/library/socket.html" target="_blank">Python — Socket Module</a><span class="exp">Build a TCP connect scanner that takes a host and a list of ports. Time it against nmap and compare.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d38"><div class="day-content"><b>D38</b> <a href="https://scapy.readthedocs.io/en/latest/" target="_blank">Scapy — Documentation</a><span class="exp">Craft an ICMP ping, a SYN packet, and an ARP request by hand. Sniff traffic on your interface with sniff().</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d39"><div class="day-content"><b>D39</b> <a href="https://git-scm.com/book/en/v2/Getting-Started-About-Version-Control" target="_blank">Pro Git — Getting Started</a><span class="exp">Install git, configure user.name and user.email. Init a repo, make your first commit, view git log.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d40"><div class="day-content"><b>D40</b> <a href="https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging" target="_blank">Pro Git — Branching & Merging</a><span class="exp">Create a feature branch, commit changes, merge back to main. Resolve a deliberate merge conflict.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d41"><div class="day-content"><b>D41</b> <a href="https://docs.github.com/en/get-started/quickstart/create-a-repo" target="_blank">GitHub — Create Your First Repository</a><span class="exp">Push your recon.sh, log parser, and port scanner to a public GitHub repo with proper READMEs.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d42"><div class="day-content"><b>D42</b> <a href="https://automatetheboringstuff.com/" target="_blank">Review: Automate the Boring Stuff — Chapter 6 (Strings)</a><span class="exp">Polish your port scanner: add threading for speed, save results to JSON, write a clean README. Tag v1.0 on GitHub.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d36"><div class="day-content"><b>D36</b> <a href="https://docs.python-requests.org/en/latest/" target="_blank">Python — Requests Library Docs</a><span class="exp">Build a script that fetches a URL, extracts all links with regex, and saves status codes. This is the start of a web fuzzer.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d37"><div class="day-content"><b>D37</b> <a href="https://docs.python.org/3/library/socket.html" target="_blank">Python — Socket Module</a><span class="exp">Build a TCP connect scanner that takes a host and a list of ports. Time it against nmap and compare.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d38"><div class="day-content"><b>D38</b> <a href="https://scapy.readthedocs.io/en/latest/" target="_blank">Scapy — Documentation</a><span class="exp">Craft an ICMP ping, a SYN packet, and an ARP request by hand. Sniff traffic on your interface with sniff().</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d39"><div class="day-content"><b>D39</b> <a href="https://git-scm.com/book/en/v2/Getting-Started-About-Version-Control" target="_blank">Pro Git — Getting Started</a><span class="exp">Install git, configure user.name and user.email. Init a repo, make your first commit, view git log.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d40"><div class="day-content"><b>D40</b> <a href="https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging" target="_blank">Pro Git — Branching & Merging</a><span class="exp">Create a feature branch, commit changes, merge back to main. Resolve a deliberate merge conflict.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d41"><div class="day-content"><b>D41</b> <a href="https://docs.github.com/en/get-started/quickstart/create-a-repo" target="_blank">GitHub — Create Your First Repository</a><span class="exp">Push your recon.sh, log parser, and port scanner to a public GitHub repo with proper READMEs.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d42"><div class="day-content"><b>D42</b> <a href="https://automatetheboringstuff.com/" target="_blank">Review: Automate the Boring Stuff — Chapter 6 (Strings)</a><span class="exp">Polish your port scanner: add threading for speed, save results to JSON, write a clean README. Tag v1.0 on GitHub.</span></div></label>
   </div>
 </div>
 
@@ -367,68 +386,68 @@
 
   <div class="week-group">
     <div class="week-title">Week 7 · Web Application Fundamentals</div>
-    <label class="day-item"><input type="checkbox" data-key="d43"><div class="day-content"><b>D43</b> <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Overview" target="_blank">MDN — HTTP: An Overview</a><span class="exp">Map every HTTP method (GET/POST/PUT/DELETE/PATCH). Use curl -v to inspect headers on a real login form.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d44"><div class="day-content"><b>D44</b> <a href="https://developer.mozilla.org/en-US/docs/Learn/Getting_started_with_the_web/HTML_basics" target="_blank">MDN — HTML Basics</a><span class="exp">Build a 1-page login form. Understand form action, method, input types, and hidden fields — every web vuln starts here.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d45"><div class="day-content"><b>D45</b> <a href="https://developer.mozilla.org/en-US/docs/Learn/Getting_started_with_the_web/JavaScript_basics" target="_blank">MDN — JavaScript Basics</a><span class="exp">Add client-side validation to your form. Understand the DOM, events, fetch(). Client-side validation can always be bypassed.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d46"><div class="day-content"><b>D46</b> <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies" target="_blank">MDN — HTTP Cookies</a><span class="exp">Understand HttpOnly, Secure, SameSite flags. Inspect cookies in your browser dev tools and identify weak configurations on real sites.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d47"><div class="day-content"><b>D47</b> <a href="https://portswigger.net/web-security/web-applications" target="_blank">PortSwigger — Web Application Security</a><span class="exp">Read their primer on URL structure, HTTP messages, and sessions. This is the foundation for every WebSec lab you'll do.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d48"><div class="day-content"><b>D48</b> <a href="https://neetcode.io/practice?tab=neetcode150" target="_blank">NeetCode — Tries</a><span class="exp">Solve Implement Trie and Design Add/Search Words. Tries power autocomplete and wordlist lookups.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d49"><div class="day-content"><b>D49</b> <a href="https://owasp.org/www-project-juice-shop/" target="_blank">Review: Install OWASP Juice Shop locally</a><span class="exp">Run Juice Shop in Docker. Browse every page. Open Burp Suite and proxy your traffic through it. You'll attack this all next week.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d43"><div class="day-content"><b>D43</b> <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Overview" target="_blank">MDN — HTTP: An Overview</a><span class="exp">Map every HTTP method (GET/POST/PUT/DELETE/PATCH). Use curl -v to inspect headers on a real login form.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d44"><div class="day-content"><b>D44</b> <a href="https://developer.mozilla.org/en-US/docs/Learn/Getting_started_with_the_web/HTML_basics" target="_blank">MDN — HTML Basics</a><span class="exp">Build a 1-page login form. Understand form action, method, input types, and hidden fields — every web vuln starts here.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d45"><div class="day-content"><b>D45</b> <a href="https://developer.mozilla.org/en-US/docs/Learn/Getting_started_with_the_web/JavaScript_basics" target="_blank">MDN — JavaScript Basics</a><span class="exp">Add client-side validation to your form. Understand the DOM, events, fetch(). Client-side validation can always be bypassed.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d46"><div class="day-content"><b>D46</b> <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies" target="_blank">MDN — HTTP Cookies</a><span class="exp">Understand HttpOnly, Secure, SameSite flags. Inspect cookies in your browser dev tools and identify weak configurations on real sites.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d47"><div class="day-content"><b>D47</b> <a href="https://portswigger.net/web-security/web-applications" target="_blank">PortSwigger — Web Application Security</a><span class="exp">Read their primer on URL structure, HTTP messages, and sessions. This is the foundation for every WebSec lab you'll do.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d48"><div class="day-content"><b>D48</b> <a href="https://neetcode.io/practice?tab=neetcode150" target="_blank">NeetCode — Tries</a><span class="exp">Solve Implement Trie and Design Add/Search Words. Tries power autocomplete and wordlist lookups.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d49"><div class="day-content"><b>D49</b> <a href="https://owasp.org/www-project-juice-shop/" target="_blank">Review: Install OWASP Juice Shop locally</a><span class="exp">Run Juice Shop in Docker. Browse every page. Open Burp Suite and proxy your traffic through it. You'll attack this all next week.</span></div></label>
   </div>
 
   <div class="week-group">
     <div class="week-title">Week 8 · OWASP Top 10</div>
-    <label class="day-item"><input type="checkbox" data-key="d50"><div class="day-content"><b>D50</b> <a href="https://owasp.org/Top10/" target="_blank">OWASP Top 10 — 2021</a><span class="exp">Read all 10 categories. For each, write a 2-sentence summary in your own words. This is your security vocabulary.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d51"><div class="day-content"><b>D51</b> <a href="https://portswigger.net/web-security/sql-injection" target="_blank">PortSwigger — SQL Injection</a><span class="exp">Read the theory. Understand UNION-based, blind, and error-based SQLi. Solve the first 3 Apprentice labs.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d52"><div class="day-content"><b>D52</b> <a href="https://portswigger.net/web-security/cross-site-scripting" target="_blank">PortSwigger — Cross-Site Scripting (XSS)</a><span class="exp">Distinguish reflected, stored, DOM-based XSS. Solve 3 Apprentice XSS labs. Build a payload cheat sheet.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d53"><div class="day-content"><b>D53</b> <a href="https://portswigger.net/web-security/csrf" target="_blank">PortSwigger — Cross-Site Request Forgery</a><span class="exp">Understand why CSRF tokens exist. Solve 2 CSRF labs. Build an HTML page that submits a forged POST request.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d54"><div class="day-content"><b>D54</b> <a href="https://portswigger.net/web-security/ssrf" target="_blank">PortSwigger — Server-Side Request Forgery</a><span class="exp">Understand why SSRF is critical in cloud environments. Solve 2 SSRF labs. Document the difference between basic and blind SSRF.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d55"><div class="day-content"><b>D55</b> <a href="https://neetcode.io/practice?tab=neetcode150" target="_blank">NeetCode — Heap / Priority Queue</a><span class="exp">Solve Kth Largest Element, Task Scheduler. Heaps power schedulers — including your own learning backlog.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d56"><div class="day-content"><b>D56</b> <a href="https://owasp.org/www-project-web-security-testing-guide/" target="_blank">Review: OWASP WSTG — Testing Guide</a><span class="exp">Skim the WSTG v4.2 table of contents. Pick 3 Juice Shop findings you'd report and write them up using the WSTG format.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d50"><div class="day-content"><b>D50</b> <a href="https://owasp.org/Top10/" target="_blank">OWASP Top 10 — 2021</a><span class="exp">Read all 10 categories. For each, write a 2-sentence summary in your own words. This is your security vocabulary.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d51"><div class="day-content"><b>D51</b> <a href="https://portswigger.net/web-security/sql-injection" target="_blank">PortSwigger — SQL Injection</a><span class="exp">Read the theory. Understand UNION-based, blind, and error-based SQLi. Solve the first 3 Apprentice labs.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d52"><div class="day-content"><b>D52</b> <a href="https://portswigger.net/web-security/cross-site-scripting" target="_blank">PortSwigger — Cross-Site Scripting (XSS)</a><span class="exp">Distinguish reflected, stored, DOM-based XSS. Solve 3 Apprentice XSS labs. Build a payload cheat sheet.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d53"><div class="day-content"><b>D53</b> <a href="https://portswigger.net/web-security/csrf" target="_blank">PortSwigger — Cross-Site Request Forgery</a><span class="exp">Understand why CSRF tokens exist. Solve 2 CSRF labs. Build an HTML page that submits a forged POST request.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d54"><div class="day-content"><b>D54</b> <a href="https://portswigger.net/web-security/ssrf" target="_blank">PortSwigger — Server-Side Request Forgery</a><span class="exp">Understand why SSRF is critical in cloud environments. Solve 2 SSRF labs. Document the difference between basic and blind SSRF.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d55"><div class="day-content"><b>D55</b> <a href="https://neetcode.io/practice?tab=neetcode150" target="_blank">NeetCode — Heap / Priority Queue</a><span class="exp">Solve Kth Largest Element, Task Scheduler. Heaps power schedulers — including your own learning backlog.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d56"><div class="day-content"><b>D56</b> <a href="https://owasp.org/www-project-web-security-testing-guide/" target="_blank">Review: OWASP WSTG — Testing Guide</a><span class="exp">Skim the WSTG v4.2 table of contents. Pick 3 Juice Shop findings you'd report and write them up using the WSTG format.</span></div></label>
   </div>
 
   <div class="week-group">
     <div class="week-title">Week 9 · Burp Suite & Web Exploitation</div>
-    <label class="day-item"><input type="checkbox" data-key="d57"><div class="day-content"><b>D57</b> <a href="https://portswigger.net/burp/documentation/desktop/getting-started" target="_blank">PortSwigger — Burp Suite Getting Started</a><span class="exp">Install Burp Community. Configure Firefox to proxy through it. Install the CA certificate. Intercept your first request.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d58"><div class="day-content"><b>D58</b> <a href="https://portswigger.net/burp/documentation/desktop/tools/repeater" target="_blank">Burp Suite — Repeater Tool</a><span class="exp">Send a request to Repeater, modify a parameter, observe the response. This is the tool you'll use 80% of the time.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d59"><div class="day-content"><b>D59</b> <a href="https://portswigger.net/burp/documentation/desktop/tools/intruder" target="_blank">Burp Suite — Intruder Tool</a><span class="exp">Run a Sniper attack against a login form with a short wordlist. Understand payload positions and markers.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d60"><div class="day-content"><b>D60</b> <a href="https://portswigger.net/web-security/sql-injection/union-attacks" target="_blank">PortSwigger — SQLi UNION Attacks</a><span class="exp">Solve 4 labs: retrieve data from other tables, multiple columns, Oracle version, MySQL version. Document each payload.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d61"><div class="day-content"><b>D61</b> <a href="https://portswigger.net/web-security/cross-site-scripting/contexts" target="_blank">PortSwigger — XSS Contexts</a><span class="exp">Solve 4 labs: XSS into HTML context, attribute, JavaScript, and URL. Build a payload list per context.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d62"><div class="day-content"><b>D62</b> <a href="https://neetcode.io/practice?tab=neetcode150" target="_blank">NeetCode — Backtracking</a><span class="exp">Solve Subsets, Combination Sum, Permutations. Backtracking = exhaustively exploring attack paths.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d63"><div class="day-content"><b>D63</b> <a href="https://portswigger.net/web-security/all-labs" target="_blank">Review: Complete 10 Apprentice Labs on PortSwigger</a><span class="exp">Pick 10 Apprentice-level labs across topics you've covered. Solve without hints. Screenshot completion banners for your portfolio.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d57"><div class="day-content"><b>D57</b> <a href="https://portswigger.net/burp/documentation/desktop/getting-started" target="_blank">PortSwigger — Burp Suite Getting Started</a><span class="exp">Install Burp Community. Configure Firefox to proxy through it. Install the CA certificate. Intercept your first request.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d58"><div class="day-content"><b>D58</b> <a href="https://portswigger.net/burp/documentation/desktop/tools/repeater" target="_blank">Burp Suite — Repeater Tool</a><span class="exp">Send a request to Repeater, modify a parameter, observe the response. This is the tool you'll use 80% of the time.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d59"><div class="day-content"><b>D59</b> <a href="https://portswigger.net/burp/documentation/desktop/tools/intruder" target="_blank">Burp Suite — Intruder Tool</a><span class="exp">Run a Sniper attack against a login form with a short wordlist. Understand payload positions and markers.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d60"><div class="day-content"><b>D60</b> <a href="https://portswigger.net/web-security/sql-injection/union-attacks" target="_blank">PortSwigger — SQLi UNION Attacks</a><span class="exp">Solve 4 labs: retrieve data from other tables, multiple columns, Oracle version, MySQL version. Document each payload.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d61"><div class="day-content"><b>D61</b> <a href="https://portswigger.net/web-security/cross-site-scripting/contexts" target="_blank">PortSwigger — XSS Contexts</a><span class="exp">Solve 4 labs: XSS into HTML context, attribute, JavaScript, and URL. Build a payload list per context.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d62"><div class="day-content"><b>D62</b> <a href="https://neetcode.io/practice?tab=neetcode150" target="_blank">NeetCode — Backtracking</a><span class="exp">Solve Subsets, Combination Sum, Permutations. Backtracking = exhaustively exploring attack paths.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d63"><div class="day-content"><b>D63</b> <a href="https://portswigger.net/web-security/all-labs" target="_blank">Review: Complete 10 Apprentice Labs on PortSwigger</a><span class="exp">Pick 10 Apprentice-level labs across topics you've covered. Solve without hints. Screenshot completion banners for your portfolio.</span></div></label>
   </div>
 
   <div class="week-group">
     <div class="week-title">Week 10 · Cryptography</div>
-    <label class="day-item"><input type="checkbox" data-key="d64"><div class="day-content"><b>D64</b> <a href="https://www.youtube.com/watch?v=ffPol43PFE4" target="_blank">Computerphile — Hashing Algorithms</a><span class="exp">Understand MD5, SHA-1, SHA-256, bcrypt. Hash a password with Python's hashlib. Explain why MD5 is broken for passwords.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d65"><div class="day-content"><b>D65</b> <a href="https://www.youtube.com/watch?v=GSIDS_lvRv4" target="_blank">Computerphile — Diffie-Hellman Key Exchange</a><span class="exp">Understand asymmetric key exchange. Draw the exchange on paper. This is the math behind TLS.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d66"><div class="day-content"><b>D66</b> <a href="https://crypto101.io/" target="_blank">Crypto 101 — Chapter on Symmetric Encryption</a><span class="exp">Read about AES, block modes (ECB vs CBC vs GCM). Encrypt a file with OpenSSL using AES-256-CBC and AES-256-GCM.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d67"><div class="day-content"><b>D67</b> <a href="https://crypto101.io/" target="_blank">Crypto 101 — Chapter on RSA</a><span class="exp">Generate an RSA keypair with OpenSSL. Sign and verify a message. Understand why small-e and small-n attacks work.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d68"><div class="day-content"><b>D68</b> <a href="https://www.youtube.com/watch?v=TmA2QWSd5JM" target="_blank">Computerphile — Public Key Cryptography</a><span class="exp">Watch and re-derive RSA by hand on paper with small primes (p=3, q=11). If you can do this, you understand RSA.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d69"><div class="day-content"><b>D69</b> <a href="https://neetcode.io/practice?tab=neetcode150" target="_blank">NeetCode — Graphs</a><span class="exp">Solve Number of Islands, Max Area of Island, Clone Graph. BFS/DFS are core to network traversal and AD pathfinding.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d70"><div class="day-content"><b>D70</b> <a href="https://ctftime.org/writeups" target="_blank">Review: Solve 3 Crypto challenges on picoCTF</a><span class="exp">Go to picoCTF, filter by Crypto, do 3 Easy challenges. Document your solve process for each — these writeups go in your portfolio.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d64"><div class="day-content"><b>D64</b> <a href="https://www.youtube.com/watch?v=ffPol43PFE4" target="_blank">Computerphile — Hashing Algorithms</a><span class="exp">Understand MD5, SHA-1, SHA-256, bcrypt. Hash a password with Python's hashlib. Explain why MD5 is broken for passwords.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d65"><div class="day-content"><b>D65</b> <a href="https://www.youtube.com/watch?v=GSIDS_lvRv4" target="_blank">Computerphile — Diffie-Hellman Key Exchange</a><span class="exp">Understand asymmetric key exchange. Draw the exchange on paper. This is the math behind TLS.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d66"><div class="day-content"><b>D66</b> <a href="https://crypto101.io/" target="_blank">Crypto 101 — Symmetric Encryption</a><span class="exp">Read about AES, block modes (ECB vs CBC vs GCM). Encrypt a file with OpenSSL using AES-256-CBC and AES-256-GCM.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d67"><div class="day-content"><b>D67</b> <a href="https://crypto101.io/" target="_blank">Crypto 101 — RSA</a><span class="exp">Generate an RSA keypair with OpenSSL. Sign and verify a message. Understand why small-e and small-n attacks work.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d68"><div class="day-content"><b>D68</b> <a href="https://www.youtube.com/watch?v=TmA2QWSd5JM" target="_blank">Computerphile — Public Key Cryptography</a><span class="exp">Watch and re-derive RSA by hand on paper with small primes (p=3, q=11). If you can do this, you understand RSA.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d69"><div class="day-content"><b>D69</b> <a href="https://neetcode.io/practice?tab=neetcode150" target="_blank">NeetCode — Graphs (BFS/DFS)</a><span class="exp">Solve Number of Islands, Max Area of Island, Clone Graph. BFS/DFS are core to network traversal and AD pathfinding.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d70"><div class="day-content"><b>D70</b> <a href="https://ctftime.org/writeups" target="_blank">Review: Solve 3 Crypto challenges on picoCTF</a><span class="exp">Go to picoCTF, filter by Crypto, do 3 Easy challenges. Document your solve process for each — these writeups go in your portfolio.</span></div></label>
   </div>
 
   <div class="week-group">
     <div class="week-title">Week 11 · Windows Internals & Active Directory</div>
-    <label class="day-item"><input type="checkbox" data-key="d71"><div class="day-content"><b>D71</b> <a href="https://academy.hackthebox.com/course/preview/windows-fundamentals" target="_blank">HackTheBox Academy — Windows Fundamentals</a><span class="exp">Understand the registry, services, processes, and SAM. Set up a Windows 10 VM. Install Sysinternals and explore.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d72"><div class="day-content"><b>D72</b> <a href="https://academy.hackthebox.com/course/preview/active-directory" target="_blank">HackTheBox Academy — Active Directory</a><span class="exp">Understand forests, domains, OUs, GPOs, trusts. Set up a Windows Server 2022 VM as a Domain Controller.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d73"><div class="day-content"><b>D73</b> <a href="https://github.com/BloodHoundAD/BloodHound" target="_blank">BloodHound — Repository & Documentation</a><span class="exp">Install BloodHound + SharpHound. Run a collector on your AD lab. Visualize attack paths in the Neo4j UI.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d74"><div class="day-content"><b>D74</b> <a href="https://tryhackme.com/room/activedirectorybasics" target="_blank">TryHackMe — Active Directory Basics</a><span class="exp">Complete this room. Take notes on LDAP, Kerberos, NTLM. Map each protocol to a potential attack you'll learn later.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d75"><div class="day-content"><b>D75</b> <a href="https://www.youtube.com/watch?v=5Nq2r1TUNX8" target="_blank">Computerphile — Kerberos Authentication</a><span class="exp">Understand TGT, TGS, KDC. Draw the full Kerberos exchange. This is the foundation for Kerberoasting & AS-REP Roasting.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d76"><div class="day-content"><b>D76</b> <a href="https://neetcode.io/practice?tab=neetcode150" target="_blank">NeetCode — 1D Dynamic Programming</a><span class="exp">Solve Climbing Stairs, House Robber, Coin Change. DP is the recursive-thinking extension you'll need for capstone.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d77"><div class="day-content"><b>D77</b> <a href="https://github.com/Swingwing0/AD-Pentest-Hashes" target="_blank">Review: Document AD attack surface</a><span class="exp">Write a 2-page doc listing every AD attack you've heard of (Kerberoasting, AS-REP, DCSync, Pass-the-Hash). You'll execute them in Phase 3.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d71"><div class="day-content"><b>D71</b> <a href="https://academy.hackthebox.com/course/preview/windows-fundamentals" target="_blank">HackTheBox Academy — Windows Fundamentals</a><span class="exp">Understand the registry, services, processes, and SAM. Set up a Windows 10 VM. Install Sysinternals and explore.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d72"><div class="day-content"><b>D72</b> <a href="https://academy.hackthebox.com/course/preview/active-directory" target="_blank">HackTheBox Academy — Active Directory</a><span class="exp">Understand forests, domains, OUs, GPOs, trusts. Set up a Windows Server 2022 VM as a Domain Controller.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d73"><div class="day-content"><b>D73</b> <a href="https://github.com/BloodHoundAD/BloodHound" target="_blank">BloodHound — Repository & Documentation</a><span class="exp">Install BloodHound + SharpHound. Run a collector on your AD lab. Visualize attack paths in the Neo4j UI.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d74"><div class="day-content"><b>D74</b> <a href="https://tryhackme.com/room/activedirectorybasics" target="_blank">TryHackMe — Active Directory Basics</a><span class="exp">Complete this room. Take notes on LDAP, Kerberos, NTLM. Map each protocol to a potential attack you'll learn later.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d75"><div class="day-content"><b>D75</b> <a href="https://www.youtube.com/watch?v=5Nq2r1TUNX8" target="_blank">Computerphile — Kerberos Authentication</a><span class="exp">Understand TGT, TGS, KDC. Draw the full Kerberos exchange. This is the foundation for Kerberoasting & AS-REP Roasting.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d76"><div class="day-content"><b>D76</b> <a href="https://neetcode.io/practice?tab=neetcode150" target="_blank">NeetCode — 1D Dynamic Programming</a><span class="exp">Solve Climbing Stairs, House Robber, Coin Change. DP is the recursive-thinking extension you'll need for capstone.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d77"><div class="day-content"><b>D77</b> <a href="https://attack.mitre.org/" target="_blank">Review: Document AD attack surface</a><span class="exp">Write a 2-page doc listing every AD attack you've heard of (Kerberoasting, AS-REP, DCSync, Pass-the-Hash). You'll execute them in Phase 3.</span></div></label>
   </div>
 
   <div class="week-group">
     <div class="week-title">Week 12 · Vulnerability Assessment</div>
-    <label class="day-item"><input type="checkbox" data-key="d78"><div class="day-content"><b>D78</b> <a href="https://nmap.org/nsedoc/" target="_blank">Nmap — NSE Script Documentation</a><span class="exp">Run scripts in the vuln, auth, brute categories against Metasploitable 2. Document findings in a structured report.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d79"><div class="day-content"><b>D79</b> <a href="https://www.tenable.com/products/nessus/nessus-essentials" target="_blank">Nessus — Essentials (Free)</a><span class="exp">Register for Nessus Essentials. Run an authenticated scan against your Kali VM. Compare results with Nmap findings.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d80"><div class="day-content"><b>D80</b> <a href="https://github.com/projectdiscovery/nuclei" target="_blank">Nuclei — ProjectDiscovery</a><span class="exp">Install Nuclei. Run it against a deliberately vulnerable site (Juice Shop). Understand templates and severity levels.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d81"><div class="day-content"><b>D81</b> <a href="https://www.zaproxy.org/docs/" target="_blank">OWASP ZAP — Documentation</a><span class="exp">Run an automated ZAP scan against Juice Shop. Compare ZAP results with manual Burp findings. Know when to use each.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d82"><div class="day-content"><b>D82</b> <a href="https://www.first.org/cvss/calculator/4.0" target="_blank">FIRST — CVSS v4.0 Calculator</a><span class="exp">Score 5 findings from your scans. Justify each metric. Real reports use CVSS — get fluent with the vector string.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d83"><div class="day-content"><b>D83</b> <a href="https://tryhackme.com/room/vulnerabilityresearch" target="_blank">TryHackMe — Vulnerability Research</a><span class="exp">Complete this room. Use searchsploit. Document how to go from "service version" to "exploit" using Exploit-DB.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d84"><div class="day-content"><b>D84</b> <a href="https://owasp.org/www-project-web-security-testing-guide/latest/" target="_blank">Review: Full VA report on Metasploitable 2</a><span class="exp">Produce a 5-page VA report: executive summary, methodology, findings (with CVSS), remediation. This is portfolio-ready.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d78"><div class="day-content"><b>D78</b> <a href="https://nmap.org/nsedoc/" target="_blank">Nmap — NSE Script Documentation</a><span class="exp">Run scripts in the vuln, auth, brute categories against Metasploitable 2. Document findings in a structured report.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d79"><div class="day-content"><b>D79</b> <a href="https://www.tenable.com/products/nessus/nessus-essentials" target="_blank">Nessus — Essentials (Free)</a><span class="exp">Register for Nessus Essentials. Run an authenticated scan against your Kali VM. Compare results with Nmap findings.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d80"><div class="day-content"><b>D80</b> <a href="https://github.com/projectdiscovery/nuclei" target="_blank">Nuclei — ProjectDiscovery</a><span class="exp">Install Nuclei. Run it against a deliberately vulnerable site (Juice Shop). Understand templates and severity levels.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d81"><div class="day-content"><b>D81</b> <a href="https://www.zaproxy.org/docs/" target="_blank">OWASP ZAP — Documentation</a><span class="exp">Run an automated ZAP scan against Juice Shop. Compare ZAP results with manual Burp findings. Know when to use each.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d82"><div class="day-content"><b>D82</b> <a href="https://www.first.org/cvss/calculator/4.0" target="_blank">FIRST — CVSS v4.0 Calculator</a><span class="exp">Score 5 findings from your scans. Justify each metric. Real reports use CVSS — get fluent with the vector string.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d83"><div class="day-content"><b>D83</b> <a href="https://tryhackme.com/room/vulnerabilityresearch" target="_blank">TryHackMe — Vulnerability Research</a><span class="exp">Complete this room. Use searchsploit. Document how to go from "service version" to "exploit" using Exploit-DB.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d84"><div class="day-content"><b>D84</b> <a href="https://owasp.org/www-project-web-security-testing-guide/latest/" target="_blank">Review: Full VA report on Metasploitable 2</a><span class="exp">Produce a 5-page VA report: executive summary, methodology, findings (with CVSS), remediation. This is portfolio-ready.</span></div></label>
   </div>
 </div>
 
@@ -446,272 +465,338 @@
 
   <div class="week-group">
     <div class="week-title">Week 13 · Penetration Testing Methodology</div>
-    <label class="day-item"><input type="checkbox" data-key="d85"><div class="day-content"><b>D85</b> <a href="http://www.pentest-standard.org/index.php/Main_Page" target="_blank">PTES — Penetration Testing Execution Standard</a><span class="exp">Read the 7 phases. Internalize pre-engagement, intel gathering, threat modeling, vulnerability analysis, exploitation, post-exploit, reporting.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d86"><div class="day-content"><b>D86</b> <a href="https://academy.hackthebox.com/course/preview/using-web-recon" target="_blank">HackTheBox Academy — Web Recon</a><span class="exp">Subdomain enumeration, wayback URLs, technology fingerprinting. Run subfinder, amass, and whatweb against a target.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d87"><div class="day-content"><b>D87</b> <a href="https://tryhackme.com/path/outline/jrpenetrationtester" target="_blank">TryHackMe — Jr Penetration Tester Path</a><span class="exp">Start the path. Complete the first 3 rooms. These mirror a real consulting engagement end-to-end.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d88"><div class="day-content"><b>D88</b> <a href="https://www.hackthebox.com/hacker/start-here" target="_blank">HackTheBox — Starting Point</a><span class="exp">Complete Tier 1 (Meow, Fawn, Dancing). Document your methodology: nmap → service enum → exploit → user → root.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d89"><div class="day-content"><b>D89</b> <a href="https://owasp.org/www-project-web-security-testing-guide/latest/3-The_OWASP_Testing_Framework/" target="_blank">OWASP WSTG — Testing Framework</a><span class="exp">Read phases 1–4 (information gathering, config testing, identity testing, auth testing). Build a checklist from this.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d90"><div class="day-content"><b>D90</b> <a href="https://neetcode.io/practice?tab=neetcode150" target="_blank">NeetCode — Bit Manipulation</a><span class="exp">Solve Number of 1 Bits, Counting Bits, Reverse Bits. Bitwise ops show up in crypto and exploit dev constantly.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d91"><div class="day-content"><b>D91</b> <a href="https://www.hackthebox.com/blog/pentest-report-template" target="_blank">Review: Write your pentest methodology doc</a><span class="exp">Combine PTES + WSTG + your own notes into a 3-page playbook. Every future engagement starts by opening this doc.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d85"><div class="day-content"><b>D85</b> <a href="http://www.pentest-standard.org/index.php/Main_Page" target="_blank">PTES — Penetration Testing Execution Standard</a><span class="exp">Read the 7 phases. Internalize pre-engagement, intel gathering, threat modeling, vulnerability analysis, exploitation, post-exploit, reporting.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d86"><div class="day-content"><b>D86</b> <a href="https://academy.hackthebox.com/course/preview/using-web-recon" target="_blank">HackTheBox Academy — Web Recon</a><span class="exp">Subdomain enumeration, wayback URLs, technology fingerprinting. Run subfinder, amass, and whatweb against a target.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d87"><div class="day-content"><b>D87</b> <a href="https://tryhackme.com/path/outline/jrpenetrationtester" target="_blank">TryHackMe — Jr Penetration Tester Path</a><span class="exp">Start the path. Complete the first 3 rooms. These mirror a real consulting engagement end-to-end.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d88"><div class="day-content"><b>D88</b> <a href="https://www.hackthebox.com/hacker/start-here" target="_blank">HackTheBox — Starting Point</a><span class="exp">Complete Tier 1 (Meow, Fawn, Dancing). Document your methodology: nmap → service enum → exploit → user → root.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d89"><div class="day-content"><b>D89</b> <a href="https://owasp.org/www-project-web-security-testing-guide/latest/3-The_OWASP_Testing_Framework/" target="_blank">OWASP WSTG — Testing Framework</a><span class="exp">Read phases 1–4 (information gathering, config testing, identity testing, auth testing). Build a checklist from this.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d90"><div class="day-content"><b>D90</b> <a href="https://neetcode.io/practice?tab=neetcode150" target="_blank">NeetCode — Bit Manipulation</a><span class="exp">Solve Number of 1 Bits, Counting Bits, Reverse Bits. Bitwise ops show up in crypto and exploit dev constantly.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d91"><div class="day-content"><b>D91</b> <a href="https://www.hackthebox.com/blog/pentest-report-template" target="_blank">Review: Write your pentest methodology doc</a><span class="exp">Combine PTES + WSTG + your own notes into a 3-page playbook. Every future engagement starts by opening this doc.</span></div></label>
   </div>
 
   <div class="week-group">
     <div class="week-title">Week 14 · Network Pentesting</div>
-    <label class="day-item"><input type="checkbox" data-key="d92"><div class="day-content"><b>D92</b> <a href="https://tryhackme.com/room/networkservices" target="_blank">TryHackMe — Network Services</a><span class="exp">Exploit FTP, SMB, Telnet. Complete every task. Take notes on default credentials and version-specific exploits.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d93"><div class="day-content"><b>D93</b> <a href="https://www.samba.org/samba/docs/current/man-html/smbclient.1.html" target="_blank">smbclient — Manual & Enumeration</a><span class="exp">Enumerate shares with smbclient -L, enum4linux, CrackMapExec. Practice null session authentication against Metasploitable.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d94"><div class="day-content"><b>D94</b> <a href="https://book.hacktricks.xyz/network-services-pentesting/pentesting-ftp" target="_blank">HackTricks — Pentesting FTP</a><span class="exp">Read the FTP section. Find an anonymous FTP, download files, attempt an exploit via searchsploit.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d95"><div class="day-content"><b>D95</b> <a href="https://book.hacktricks.xyz/network-services-pentesting/pentesting-snmp" target="_blank">HackTricks — Pentesting SNMP</a><span class="exp">Use snmpwalk, onesixtyone, snmp-check. Pull the full MIB tree. SNMP often leaks user lists and processes.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d96"><div class="day-content"><b>D96</b> <a href="https://docs.metasploit.com/" target="_blank">Metasploit — Documentation</a><span class="exp">Master msfconsole, search, use, set, exploit. Use auxiliary/scanner modules and a multi/handler for reverse shells.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d97"><div class="day-content"><b>D97</b> <a href="https://www.youtube.com/@ippsec" target="_blank">IppSec — HackTheBox Walkthroughs</a><span class="exp">Watch 2 IppSec walkthroughs of Easy boxes. Take notes on his methodology, not just the exploits. Methodology &gt; exploits.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d98"><div class="day-content"><b>D98</b> <a href="https://app.hackthebox.com/machines" target="_blank">Review: Hack 3 Easy HackTheBox Boxes</a><span class="exp">Without walkthroughs. Time-box: 2 hours per box. If stuck, allow yourself 1 hint from IppSec. Document each kill chain.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d92"><div class="day-content"><b>D92</b> <a href="https://tryhackme.com/room/networkservices" target="_blank">TryHackMe — Network Services</a><span class="exp">Exploit FTP, SMB, Telnet. Complete every task. Take notes on default credentials and version-specific exploits.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d93"><div class="day-content"><b>D93</b> <a href="https://www.samba.org/samba/docs/current/man-html/smbclient.1.html" target="_blank">smbclient — Manual & Enumeration</a><span class="exp">Enumerate shares with smbclient -L, enum4linux, CrackMapExec. Practice null session authentication against Metasploitable.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d94"><div class="day-content"><b>D94</b> <a href="https://book.hacktricks.xyz/network-services-pentesting/pentesting-ftp" target="_blank">HackTricks — Pentesting FTP</a><span class="exp">Read the FTP section. Find an anonymous FTP, download files, attempt an exploit via searchsploit.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d95"><div class="day-content"><b>D95</b> <a href="https://book.hacktricks.xyz/network-services-pentesting/pentesting-snmp" target="_blank">HackTricks — Pentesting SNMP</a><span class="exp">Use snmpwalk, onesixtyone, snmp-check. Pull the full MIB tree. SNMP often leaks user lists and processes.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d96"><div class="day-content"><b>D96</b> <a href="https://docs.metasploit.com/" target="_blank">Metasploit — Documentation</a><span class="exp">Master msfconsole, search, use, set, exploit. Use auxiliary/scanner modules and a multi/handler for reverse shells.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d97"><div class="day-content"><b>D97</b> <a href="https://neetcode.io/practice?tab=neetcode150" target="_blank">NeetCode — Graphs (Advanced)</a><span class="exp">Solve Course Schedule, Pacific Atlantic Water Flow, Graph Valid Tree. Graph problems model network topologies.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d98"><div class="day-content"><b>D98</b> <a href="https://tryhackme.com/room/rpmetasploit" target="_blank">Review: Complete 3 HTB Easy machines</a><span class="exp">Pwn 3 Easy boxes on HTB. For each, write a full methodology report. Focus on clean documentation.</span></div></label>
   </div>
 
   <div class="week-group">
-    <div class="week-title">Week 15 · Web Application Pentesting</div>
-    <label class="day-item"><input type="checkbox" data-key="d99"><div class="day-content"><b>D99</b> <a href="https://portswigger.net/web-security/authentication" target="_blank">PortSwigger — Authentication Vulnerabilities</a><span class="exp">Complete 4 labs: brute force, username enumeration, broken 2FA, password reset poisoning. Build a Hydra wordlist attack.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d100"><div class="day-content"><b>D100</b> <a href="https://portswigger.net/web-security/access-control" target="_blank">PortSwigger — Access Control</a><span class="exp">Complete 4 labs: IDOR, broken access control, multi-step processes, method-based bypass. IDOR is the #1 bug bounty finding.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d101"><div class="day-content"><b>D101</b> <a href="https://portswigger.net/web-security/file-upload" target="_blank">PortSwigger — File Upload Vulnerabilities</a><span class="exp">Complete 4 labs: upload web shell, bypass extension filters, bypass content-type, path traversal upload.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d102"><div class="day-content"><b>D102</b> <a href="https://portswigger.net/web-security/server-side-template-injection" target="_blank">PortSwigger — Server-Side Template Injection</a><span class="exp">Complete 3 SSTI labs. Identify the template engine, then craft the correct payload. SSTI often leads to RCE.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d103"><div class="day-content"><b>D103</b> <a href="https://owasp.org/www-project-juice-shop/" target="_blank">OWASP Juice Shop — Solve 10 Challenges</a><span class="exp">Solve challenges across all difficulty tiers. Each one earns a badge. Screenshot the scoreboard for your portfolio.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d104"><div class="day-content"><b>D104</b> <a href="https://portswigger.net/web-security/jwt" target="_blank">PortSwigger — JWT Attacks</a><span class="exp">Complete 3 labs: none algorithm, weak HS256 secret, algorithm confusion. JWT is everywhere in modern APIs.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d105"><div class="day-content"><b>D105</b> <a href="https://portswigger.net/web-security/all-labs" target="_blank">Review: Complete 20 PortSwigger Labs Total</a><span class="exp">Hit 20 labs solved on your PortSwigger profile. This is the single most respected free web security training in the industry.</span></div></label>
+    <div class="week-title">Week 15 · Web App Pentesting Deep-Dive</div>
+    <label class="day-item"><input type="checkbox" id="d99"><div class="day-content"><b>D99</b> <a href="https://portswigger.net/web-security/authentication" target="_blank">PortSwigger — Authentication Vulnerabilities</a><span class="exp">Solve 4 labs: brute force, username enumeration, password reset flaws, 2FA bypass. Document each bypass technique.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d100"><div class="day-content"><b>D100</b> <a href="https://portswigger.net/web-security/access-control" target="_blank">PortSwigger — Access Control</a><span class="exp">Solve 4 labs: IDOR, horizontal privilege escalation, vertical privilege escalation, multi-step. This is the most common real-world bug.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d101"><div class="day-content"><b>D101</b> <a href="https://portswigger.net/web-security/file-upload" target="_blank">PortSwigger — File Upload Vulnerabilities</a><span class="exp">Solve 3 labs: webshell upload via extension bypass, content-type bypass, double extension. Build a polyglot file.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d102"><div class="day-content"><b>D102</b> <a href="https://portswigger.net/web-security/deserialization" target="_blank">PortSwigger — Insecure Deserialization</a><span class="exp">Solve 2 labs: Java deserialization, PHP deserialization. Understand why this leads to RCE.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d103"><div class="day-content"><b>D103</b> <a href="https://portswigger.net/web-security/ssrf" target="_blank">PortSwigger — Advanced SSRF</a><span class="exp">Solve 3 labs: SSRF with filter bypass, SSRF via open redirect, blind SSRF with out-of-band. Cloud SSRF = critical severity.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d104"><div class="day-content"><b>D104</b> <a href="https://neetcode.io/practice?tab=neetcode150" target="_blank">NeetCode — 2D Dynamic Programming</a><span class="exp">Solve Longest Common Subsequence, Edit Distance, Unique Paths II. 2D DP maps to grid-based problems.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d105"><div class="day-content"><b>D105</b> <a href="https://portswigger.net/web-security/all-labs" target="_blank">Review: Complete 10 Practitioner Labs on PortSwigger</a><span class="exp">These are harder than Apprentice. Solve without hints. Each one teaches a technique you'll find in bug bounty programs.</span></div></label>
   </div>
 
   <div class="week-group">
-    <div class="week-title">Week 16 · Privilege Escalation</div>
-    <label class="day-item"><input type="checkbox" data-key="d106"><div class="day-content"><b>D106</b> <a href="https://tryhackme.com/room/linuxprivesc" target="_blank">TryHackMe — Linux Privilege Escalation</a><span class="exp">Complete the entire room. Sudo, SUID, kernel exploits, cron jobs, PATH hijacking, capabilities. This is mandatory knowledge.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d107"><div class="day-content"><b>D107</b> <a href="https://tryhackme.com/room/windowsprivesc20" target="_blank">TryHackMe — Windows Privilege Escalation</a><span class="exp">Complete the entire room. Service misconfigs, registry exploits, token impersonation, unquoted service paths.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d108"><div class="day-content"><b>D108</b> <a href="https://gtfobins.github.io/" target="_blank">GTFOBins — Unix Binary Exploitation</a><span class="exp">Memorize 10 most common GTFOBins entries (vim, find, python, perl, nmap, awk, less, env, cp, tar). Bookmark the site.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d109"><div class="day-content"><b>D109</b> <a href="https://lolbas-project.github.io/" target="_blank">LOLBAS — Living Off The Land Binaries (Windows)</a><span class="exp">Browse the project. Pick 5 binaries (certutil, bitsadmin, mshta, rundll32, powershell) and document attacker use cases.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d110"><div class="day-content"><b>D110</b> <a href="https://github.com/carlospolop/PEASS-ng" target="_blank">PEASS — LinPEAS & WinPEAS</a><span class="exp">Run LinPEAS on a TryHackMe Linux box. Parse the output — focus on red/yellow findings. Automate the boring recon.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d111"><div class="day-content"><b>D111</b> <a href="https://app.hackthebox.com/machines" target="_blank">HackTheBox — 2 Medium Boxes (Linux privesc focus)</a><span class="exp">Pick boxes flagged for Linux privesc. Document the exact escalation vector you used with screenshots.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d112"><div class="day-content"><b>D112</b> <a href="https://github.com/swisskyrepo/PayloadsAllTheThings" target="_blank">Review: Build your privesc checklist</a><span class="exp">Create a 2-page privesc checklist you can run on every engagement. Save it as privesc-checklist.md on GitHub.</span></div></label>
+    <div class="week-title">Week 16 · Linux Privilege Escalation</div>
+    <label class="day-item"><input type="checkbox" id="d106"><div class="day-content"><b>D106</b> <a href="https://book.hacktricks.xyz/linux-hardening/linux-privilege-escalation-checklist" target="_blank">HackTricks — Linux Privesc Checklist</a><span class="exp">Read the entire page. This is your go-to reference for every Linux box you'll ever pwn.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d107"><div class="day-content"><b>D107</b> <a href="https://github.com/rebootuser/LinPEAS" target="_blank">LinPEAS — Linux Privilege Escalation</a><span class="exp">Run LinPEAS on 3 different vulnerable machines. Understand every section of output. Customize for speed.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d108"><div class="day-content"><b>D108</b> <a href="https://tryhackme.com/room/linuxfundamentals3" target="_blank">TryHackMe — Linux PrivEsc (Part 1)</a><span class="exp">SUID binaries, cron jobs, capabilities. Complete every task and document the exploit path.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d109"><div class="day-content"><b>D109</b> <a href="https://tryhackme.com/room/linprivesc" target="_blank">TryHackMe — Linux PrivEsc (Part 2)</a><span class="exp">Kernel exploits, NFS no_root_squash, docker escape. These are the high-impact vectors.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d110"><div class="day-content"><b>D110</b> <a href="https://gtfobins.github.io/" target="_blank">GTFOBins — Unix Binary Exploits</a><span class="exp">Learn to abuse find, vim, python, perl, awk for file read/write/shell. Practice on your Kali VM.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d111"><div class="day-content"><b>D111</b> <a href="https://neetcode.io/practice?tab=neetcode150" target="_blank">NeetCode — Intervals</a><span class="exp">Solve Merge Intervals, Insert Interval, Non-overlapping Intervals. Interval problems model time-based access controls.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d112"><div class="day-content"><b>D112</b> <a href="https://www.hackthebox.com/" target="_blank">Review: Pwn 5 HTB Linux machines</a><span class="exp">Focus on privesc variety: one SUID, one cron, one kernel, one capability, one NFS. Write privesc notes for each.</span></div></label>
   </div>
 
   <div class="week-group">
-    <div class="week-title">Week 17 · Cloud Security</div>
-    <label class="day-item"><input type="checkbox" data-key="d113"><div class="day-content"><b>D113</b> <a href="https://aws.amazon.com/training/learn-about/cloud-security/" target="_blank">AWS — Cloud Security Fundamentals</a><span class="exp">Watch the free AWS Cloud Security module. Understand IAM, S3, STS, and the shared responsibility model.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d114"><div class="day-content"><b>D114</b> <a href="https://hackingthe.cloud/" target="_blank">Hacking The Cloud — TTPs</a><span class="exp">Read the AWS sections. Document each attack: S3 enumeration, IAM privesc, lambda backdoor, credential theft.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d115"><div class="day-content"><b>D115</b> <a href="https://github.com/RhinoSecurityLabs/pacu" target="_blank">Pacu — AWS Exploitation Framework</a><span class="exp">Install Pacu. Set up a free AWS account, run IAM enumeration modules. Pacu is the Metasploit of AWS.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d116"><div class="day-content"><b>D116</b> <a href="https://tryhackme.com/room/cloudfundamentals" target="_blank">TryHackMe — Cloud Fundamentals</a><span class="exp">Complete the room. Understand virtualization, containers, serverless, and the security boundaries between them.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d117"><div class="day-content"><b>D117</b> <a href="https://learn.microsoft.com/en-us/azure/security/" target="_blank">Microsoft Learn — Azure Security</a><span class="exp">Read about Entra ID (formerly Azure AD), conditional access, and the most common Azure AD attacks.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d118"><div class="day-content"><b>D118</b> <a href="https://github.com/cyberark/SkyArk" target="_blank">SkyArk / Cloud Tools Survey</a><span class="exp">Survey ScoutSuite, Prowler, CloudSploit. Run ScoutSuite against your AWS account. Read the report.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d119"><div class="day-content"><b>D119</b> <a href="https://attack.mitre.org/matrices/enterprise/cloud/" target="_blank">Review: MITRE ATT&CK Cloud Matrix</a><span class="exp">Map 5 cloud attacks to MITRE techniques. Write a short doc: "How I'd assess an AWS environment in 4 hours."</span></div></label>
+    <div class="week-title">Week 17 · Windows Privesc & AD Attacks</div>
+    <label class="day-item"><input type="checkbox" id="d113"><div class="day-content"><b>D113</b> <a href="https://book.hacktricks.xyz/windows-hardening/windows-local-privilege-escalation" target="_blank">HackTricks — Windows Privesc Checklist</a><span class="exp">Read the entire page. Windows privesc is different from Linux — learn the Windows-specific vectors.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d114"><div class="day-content"><b>D114</b> <a href="https://github.com/carlospolop/PEASS-ng/tree/master/winPEAS" target="_blank">WinPEAS — Windows Privilege Escalation</a><span class="exp">Run WinPEAS on your Windows VM. Understand unquoted service paths, always install elevated, registry exploits.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d115"><div class="day-content"><b>D115</b> <a href="https://tryhackme.com/room/windowsprivesc" target="_blank">TryHackMe — Windows PrivEsc</a><span class="exp">Complete the room. Practice service exploitation, token impersonation, DLL hijacking.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d116"><div class="day-content"><b>D116</b> <a href="https://book.hacktricks.xyz/windows-hardening/active-directory-methodology" target="_blank">HackTricks — AD Attack Methodology</a><span class="exp">Read the full methodology. From initial access to domain dominance. This is your AD attack playbook.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d117"><div class="day-content"><b>D117</b> <a href="https://github.com/PowerShellMafia/PowerSploit" target="_blank">PowerSploit — PowerShell Post-Exploitation</a><span class="exp">Use Invoke-Kerberoast, Get-GPPPassword, Invoke-Mimikatz. Run each in your AD lab and document output.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d118"><div class="day-content"><b>D118</b> <a href="https://neetcode.io/practice?tab=neetcode150" target="_blank">NeetCode — Greedy</a><span class="exp">Solve Maximum Subarray, Jump Game, Gas Station. Greedy algorithms optimize attack path selection.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d119"><div class="day-content"><b>D119</b> <a href="https://tryhackme.com/room/attacktive Directory" target="_blank">Review: Complete an AD attack chain in your lab</a><span class="exp">User → Kerberoast → crack → PSExec → DCSync → domain admin. Document every step with screenshots.</span></div></label>
   </div>
 
   <div class="week-group">
-    <div class="week-title">Week 18 · SOC, SIEM & Blue Team</div>
-    <label class="day-item"><input type="checkbox" data-key="d120"><div class="day-content"><b>D120</b> <a href="https://www.splunk.com/en_us/training/free-courses/what-is-splunk.html" target="_blank">Splunk — Free Fundamentals Course</a><span class="exp">Complete Splunk 7.x/Fundamentals 1 (free). Learn SPL: search, stats, chart, timechart, eval, where, table.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d121"><div class="day-content"><b>D121</b> <a href="https://attack.mitre.org/" target="_blank">MITRE ATT&CK Framework</a><span class="exp">Read the 14 tactics. Pick 5 techniques per tactic. This is the universal language between red and blue teams.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d122"><div class="day-content"><b>D122</b> <a href="https://letsdefend.io/" target="_blank">LetsDefend — SOC Analyst Training</a><span class="exp">Create a free LetsDefend account. Complete 5 alerts. Document your triage process for each.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d123"><div class="day-content"><b>D123</b> <a href="https://www.nist.gov/cyberframework" target="_blank">NIST — Incident Response Framework</a><span class="exp">Memorize the 4 phases: Preparation, Detection & Analysis, Containment/Eradication/Recovery, Post-Incident Activity.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d124"><div class="day-content"><b>D124</b> <a href="https://cyberdefenders.org/" target="_blank">CyberDefenders — Blue Team Labs</a><span class="exp">Complete 3 free blue team labs. Focus on log analysis and network forensics. Take notes on indicators of compromise.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d125"><div class="day-content"><b>D125</b> <a href="https://tryhackme.com/path/outline/soclevel1" target="_blank">TryHackMe — SOC Level 1 Path</a><span class="exp">Start the SOC Level 1 path. Complete the first 5 rooms. This is the most direct route to a SOC analyst role.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d126"><div class="day-content"><b>D126</b> <a href="https://attack.mitre.org/resources/training/" target="_blank">Review: Analyze 3 incident scenarios</a><span class="exp">Take 3 LetsDefend alerts from start to closeout. Write an incident report for each: timeline, IOCs, root cause, recommendations.</span></div></label>
+    <div class="week-title">Week 18 · Cloud Security & Blue Team Basics</div>
+    <label class="day-item"><input type="checkbox" id="d120"><div class="day-content"><b>D120</b> <a href="https://tryhackme.com/room/cloudsecurity101" target="_blank">TryHackMe — Cloud Security 101</a><span class="exp">Understand IAM, shared responsibility model, SaaS/PaaS/IaaS attack surfaces. Complete all tasks.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d121"><div class="day-content"><b>D121</b> <a href="https://tryhackme.com/room/awsgeneral" target="_blank">TryHackMe — AWS Fundamentals</a><span class="exp">Learn S3, EC2, IAM, Lambda basics. Understand how misconfigured S3 buckets lead to data breaches.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d122"><div class="day-content"><b>D122</b> <a href="https://tryhackme.com/room/siem" target="_blank">TryHackMe — SIEM Fundamentals</a><span class="exp">Understand log aggregation, correlation rules, alerting. Set up a basic ELK stack or Splunk free tier.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d123"><div class="day-content"><b>D123</b> <a href="https://tryhackme.com/room/securityoperations" target="_blank">TryHackMe — Security Operations</a><span class="exp">Understand SOC workflows: triage, investigation, incident response. Walk through a simulated incident.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d124"><div class="day-content"><b>D124</b> <a href="https://tryhackme.com/room/suricata" target="_blank">TryHackMe — Suricata (IDS/IPS)</a><span class="exp">Write custom Suricata rules to detect SQL injection, XSS, and port scans. Test against your own traffic.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d125"><div class="day-content"><b>D125</b> <a href="https://neetcode.io/practice?tab=neetcode150" target="_blank">NeetCode — Math & Geometry</a><span class="exp">Solve Rotate Image, Spiral Matrix, Set Matrix Zeroes. These patterns appear in crypto and steganography challenges.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d126"><div class="day-content"><b>D126</b> <a href="https://www.hackthebox.com/" target="_blank">Review: Write a full pentest report for an HTB machine</a><span class="exp">Pick one HTB machine. Write a professional report: exec summary, scope, methodology, findings (CVSS), remediation, appendix.</span></div></label>
   </div>
 </div>
 
-<!-- ============ PHASE 4: CAPSTONE + INTERVIEW ============ -->
+<!-- ============ PHASE 4: CAPSTONE ============ -->
 <div class="phase" id="phase-3">
   <div class="phase-header">
-    <h2>🔴 Phase 4 · Capstone + Interview Prep</h2>
-    <p>The final 6 weeks. Reverse engineering fundamentals, exploit development, red team operations, a full capstone AD engagement, certification prep, and job applications. This is where you become employable.</p>
+    <h2>🔴 Phase 4 · Capstone & Certification Prep</h2>
+    <p>Advanced exploitation, red team operations, malware analysis basics, OSCP-style exam prep, and your capstone project. This phase transforms you from "student" to "professional." By day 168, you have a portfolio, a certification path, and real-world experience.</p>
     <div class="phase-meta">
       <span>Weeks 19–24</span>
       <span>42 days</span>
-      <span>Focus: RevEng · Exploit Dev · Red Team · Jobs</span>
+      <span>Focus: Red Team · Malware · OSCP · Capstone · Career</span>
     </div>
   </div>
 
   <div class="week-group">
-    <div class="week-title">Week 19 · Reverse Engineering Intro</div>
-    <label class="day-item"><input type="checkbox" data-key="d127"><div class="day-content"><b>D127</b> <a href="https://www.youtube.com/playlist?list=PLhixgUqwRjQMUjbyFCpQcidaUVgBVTQoy" target="_blank">LiveOverflow — Binary Exploitation Playlist</a><span class="exp">Watch videos 1–8. Take notes on memory layout: stack, heap, code, data. Understand endianness.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d128"><div class="day-content"><b>D128</b> <a href="https://www.youtube.com/watch?v=75gBFiFtAb8" target="_blank">Creel — x86 Assembly Crash Course</a><span class="exp">Learn registers (eax, ebx, ecx, eip, esp, ebp). Read mov, push, pop, jmp, cmp, call. Disassemble a hello world with objdump.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d129"><div class="day-content"><b>D129</b> <a href="https://ghidra-sre.org/" target="_blank">Ghidra — Install & First Reverse</a><span class="exp">Install Ghidra. Import a compiled C program. Use the decompiler view. Rename functions and add comments to map logic.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d130"><div class="day-content"><b>D130</b> <a href="https://picoctf.org/" target="_blank">picoCTF — Reverse Engineering (3 challenges)</a><span class="exp">Solve 3 Easy RE challenges. Use strings, ltrace, strace, and Ghidra. Document your solve process.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d131"><div class="day-content"><b>D131</b> <a href="https://github.com/RsaCtfTool/RsaCtfTool" target="_blank">Static Analysis Practice with Radare2</a><span class="exp">Install radare2. Open a binary, list strings, find main, view the call graph. Compare radare2 with Ghidra.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d132"><div class="day-content"><b>D132</b> <a href="https://malware-traffic-analysis.net/" target="_blank">Malware Traffic Analysis — Practice PCAPs</a><span class="exp">Analyze 1 malware PCAP. Extract the malicious file, identify C2 traffic. Write a short analysis report.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d133"><div class="day-content"><b>D133</b> <a href="https://crackmes.one/" target="_blank">Review: Reverse a crackme from crackmes.one</a><span class="exp">Pick an Easy crackme. Find the password by patching jumps in Ghidra. Document your patch with before/after disassembly.</span></div></label>
+    <div class="week-title">Week 19 · Advanced Web Exploitation</div>
+    <label class="day-item"><input type="checkbox" id="d127"><div class="day-content"><b>D127</b> <a href="https://portswigger.net/web-security/sql-injection/blind" target="_blank">PortSwigger — Blind SQL Injection</a><span class="exp">Solve 4 blind SQLi labs using boolean-based and time-based techniques. Automate with sqlmap.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d128"><div class="day-content"><b>D128</b> <a href="https://portswigger.net/web-security/logic-flaws" target="_blank">PortSwigger — Business Logic Flaws</a><span class="exp">Solve 3 labs. These bugs require thinking like a user, not a scanner. No automated tool finds these.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d129"><div class="day-content"><b>D129</b> <a href="https://portswigger.net/web-security/jwt" target="_blank">PortSwigger — JWT Attacks</a><span class="exp">Solve 3 labs: algorithm confusion, none algorithm, RS256→HS256. JWT is everywhere in modern apps.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d130"><div class="day-content"><b>D130</b> <a href="https://portswigger.net/web-security/api-testing" target="_blank">PortSwigger — API Testing</a><span class="exp">Solve 3 labs: REST API mass assignment, BOLA (IDOR on APIs), rate limit bypass. APIs are the new attack surface.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d131"><div class="day-content"><b>D131</b> <a href="https://www.youtube.com/watch?v=2N7kidEBF3k" target="_blank">LiveOverflow — Web Exploitation Series</a><span class="exp">Watch 3 episodes. LiveOverflow teaches you to think about vulnerabilities, not just follow steps.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d132"><div class="day-content"><b>D132</b> <a href="https://neetcode.io/practice?tab=neetcode150" target="_blank">NeetCode — Advanced Graphs</a><span class="exp">Solve Cheapest Flights Within K Stops, Word Ladder, Reconstruct Itinerary. These model multi-hop attack paths.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d133"><div class="day-content"><b>D133</b> <a href="https://portswigger.net/web-security/all-labs" target="_blank">Review: Complete 5 Expert Labs on PortSwigger</a><span class="exp">Expert labs require chaining multiple vulnerabilities. Solve 5 and write detailed writeups for each.</span></div></label>
   </div>
 
   <div class="week-group">
-    <div class="week-title">Week 20 · Exploit Development</div>
-    <label class="day-item"><input type="checkbox" data-key="d134"><div class="day-content"><b>D134</b> <a href="https://www.youtube.com/playlist?list=PLhixgUqwRjQMUjbyFCpQcidaUVgBVTQoy" target="_blank">LiveOverflow — Buffer Overflow Videos</a><span class="exp">Watch the buffer overflow videos. Understand the stack frame, saved EBP, saved EIP, and how overflow overwrites return address.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d135"><div class="day-content"><b>D135</b> <a href="https://github.com/justinsteven/dostackbufferoverflowgood" target="_blank">dostackbufferoverflowgood — Practice Lab</a><span class="exp">Complete this lab end-to-end. Build a working exploit: crash, find offset, JMP ESP, shellcode, reverse shell.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d136"><div class="day-content"><b>D136</b> <a href="https://pwntools.readthedocs.io/en/stable/" target="_blank">pwntools — Documentation</a><span class="exp">Install pwntools. Rewrite your stack overflow exploit in Python using pwntools. Much cleaner than raw sockets.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d137"><div class="day-content"><b>D137</b> <a href="https://www.ired.team/offensive-security/defense-evasion/dep-bypassing-with-rop" target="_blank">ired.team — ROP Chains & DEP Bypass</a><span class="exp">Read about DEP, ASLR, and ROP. Build a small ROP chain to call win() in a practice binary. ROP is the gateway to modern exploit dev.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d138"><div class="day-content"><b>D138</b> <a href="https://pwn.college/" target="_blank">pwn.college — Program Exploitation Module</a><span class="exp">Complete the first 5 modules. pwn.college is the best free university-grade exploit dev course in the world.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d139"><div class="day-content"><b>D139</b> <a href="https://picoctf.org/" target="_blank">picoCTF — Binary Exploitation (5 challenges)</a><span class="exp">Solve 5 Pwn challenges at the Easy/Medium level. Write a writeup for each. These go in your portfolio.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d140"><div class="day-content"><b>D140</b> <a href="https://github.com/CTFResources/Resources" target="_blank">Review: Document your exploit dev progress</a><span class="exp">Write a blog-style post: "From zero to first RCE in 7 days." Push to GitHub with exploit code and the vulnerable binary.</span></div></label>
+    <div class="week-title">Week 20 · Red Team Operations</div>
+    <label class="day-item"><input type="checkbox" id="d134"><div class="day-content"><b>D134</b> <a href="https://tryhackme.com/room/redteamfundamentals" target="_blank">TryHackMe — Red Team Fundamentals</a><span class="exp">Understand the difference between pentest and red team. Learn MITRE ATT&CK mapping, rules of engagement, OPSEC.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d135"><div class="day-content"><b>D135</b> <a href="https://github.com/BC-SECURITY/Empire" target="_blank">Empire — C2 Framework</a><span class="exp">Set up Empire. Generate a stager, establish a listener, pivot through a compromised host. Understand the C2 lifecycle.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d136"><div class="day-content"><b>D136</b> <a href="https://tryhackme.com/room/rpmetasploit" target="_blank">TryHackMe — Metasploit (Advanced)</a><span class="exp">Meterpreter pivoting, route add, autoroute, portfwd. Pivot through one machine to reach another subnet.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d137"><div class="day-content"><b>D137</b> <a href="https://tryhackme.com/room/active Directorypentest" target="_blank">TryHackMe — AD Pentest</a><span class="exp">Full AD attack chain: recon → initial access → privesc → lateral movement → domain dominance → persistence.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d138"><div class="day-content"><b>D138</b> <a href="https://github.com/splitsaw/Covenant" target="_blank">Covenant — .NET C2 Framework</a><span class="exp">Set up Covenant. Generate a .NET loader, understand how it evades AMSI. Compare with Empire.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d139"><div class="day-content"><b>D139</b> <a href="https://neetcode.io/practice?tab=neetcode150" target="_blank">NeetCode — Mock Interview (Timed)</a><span class="exp">Set a 45-min timer. Solve 2 Medium problems back-to-back. This simulates a real technical interview round.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d140"><div class="day-content"><b>D140</b> <a href="https://attack.mitre.org/" target="_blank">Review: Map your AD attack chain to MITRE ATT&CK</a><span class="exp">Take your D119 attack chain and map every technique to a T-ID. This is how professional red teams report.</span></div></label>
   </div>
 
   <div class="week-group">
-    <div class="week-title">Week 21 · Red Team Operations</div>
-    <label class="day-item"><input type="checkbox" data-key="d141"><div class="day-content"><b>D141</b> <a href="https://tryhackme.com/path/outline/redteam" target="_blank">TryHackMe — Red Team Path</a><span class="exp">Start the Red Team path. Complete the first 4 rooms. Red team ≠ pentest: focus on stealth, dwell time, objectives.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d142"><div class="day-content"><b>D142</b> <a href="https://github.com/BishopFox/sliver" target="_blank">Sliver — C2 Framework</a><span class="exp">Install Sliver. Generate an implant, deploy to a Windows VM, execute commands. Sliver is the modern open-source Cobalt Strike.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d143"><div class="day-content"><b>D143</b> <a href="https://attack.mitre.org/tactics/TA0008/" target="_blank">MITRE ATT&CK — Lateral Movement</a><span class="exp">Study T1021 (Remote Services), T1075 (Pass the Hash), T1550 (Use Alternate Auth Material). Practice PsExec, WMI, WinRM lateral movement.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d144"><div class="day-content"><b>D144</b> <a href="https://attack.mitre.org/tactics/TA0003/" target="_blank">MITRE ATT&CK — Persistence</a><span class="exp">Practice 5 persistence techniques: registry run keys, scheduled tasks, WMI event subscriptions, services, DLL hijacking.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d145"><div class="day-content"><b>D145</b> <a href="https://attack.mitre.org/tactics/TA0005/" target="_blank">MITRE ATT&CK — Defense Evasion</a><span class="exp">Study T1027 (Obfuscation), T1036 (Masquerading), T1562 (Impair Defenses). Practice AMSI bypass and basic sandbox evasion.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d146"><div class="day-content"><b>D146</b> <a href="https://www.hackthebox.com/hacker/pro-labs" target="_blank">HackTheBox Pro Labs (Dante — free tier if available)</a><span class="exp">Attempt the first 3 machines of Dante Pro Lab. This simulates a real internal network engagement. Pivot between machines.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d147"><div class="day-content"><b>D147</b> <a href="https://redteam.guide/" target="_blank">Review: Document the red team kill chain</a><span class="exp">Write a "Red Team Engagement Playbook" covering initial access, execution, persistence, privilege escalation, defense evasion, credential access, lateral movement, exfiltration. Push to GitHub.</span></div></label>
+    <div class="week-title">Week 21 · Malware Analysis Basics</div>
+    <label class="day-item"><input type="checkbox" id="d141"><div class="day-content"><b>D141</b> <a href="https://tryhackme.com/room/malwareintro" target="_blank">TryHackMe — Malware Intro</a><span class="exp">Understand malware types: virus, worm, trojan, ransomware, rootkit, RAT. Complete all tasks.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d142"><div class="day-content"><b>D142</b> <a href="https://any.run/" target="_blank">ANY.RUN — Interactive Malware Analysis</a><span class="exp">Upload 3 samples from MalwareBazaar. Observe process tree, network connections, file system changes in real time.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d143"><div class="day-content"><b>D143</b> <a href="https://github.com/holloway/hairball" target="_blank">Static Analysis — Strings & Imports</a><span class="exp">Use strings, ltrace, strace, objdump on a sample. Extract URLs, IPs, and function calls without executing it.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d144"><div class="day-content"><b>D144</b> <a href="https://docs.flare.vm/flare-vm/" target="_blank">FLARE VM — Malware Analysis Environment</a><span class="exp">Set up FLARE VM in VirtualBox. Install IDA Free, x64dbg, Process Monitor. This is your malware lab.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d145"><div class="day-content"><b>D145</b> <a href="https://www.youtube.com/watch?v=MRpMV3rVHJU" target="_blank">John Hammond — Malware Analysis Walkthrough</a><span class="exp">Follow along as John dissects a real malware sample. Replicate his methodology on a different sample.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d146"><div class="day-content"><b>D146</b> <a href="https://neetcode.io/practice?tab=neetcode150" target="_blank">NeetCode — Mock Interview Round 2</a><span class="exp">45 minutes, 2 Medium + 1 Hard. Practice explaining your approach out loud — interviewers evaluate communication.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d147"><div class="day-content"><b>D147</b> <a href="https://bazaar.abuse.ch/" target="_blank">Review: Write a malware analysis report</a><span class="exp">Pick one sample from MalwareBazaar. Write a full report: hash, behavior, network IOCs, persistence, recommendations.</span></div></label>
   </div>
 
   <div class="week-group">
-    <div class="week-title">Week 22 · Capstone Project</div>
-    <label class="day-item"><input type="checkbox" data-key="d148"><div class="day-content"><b>D148</b> <a href="https://github.com/joshika39/Active-Directory-Lab" target="_blank">Plan: Design your AD capstone lab</a><span class="exp">Architecture: 1 DC (Windows Server 2022), 2 clients (Windows 10), 1 Kali attack box. Document IP plan, domain name, user accounts.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d149"><div class="day-content"><b>D149</b> <a href="https://developer.microsoft.com/en-us/windows/downloads/virtual-machines/" target="_blank">Build: Deploy the AD lab</a><span class="exp">Install DC, promote to domain controller, create 5 user accounts, join 2 clients to domain. Take snapshots before any attacks.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d150"><div class="day-content"><b>D150</b> <a href="https://github.com/PowerShellMafia/PowerSploit" target="_blank">Execute: Recon & enumeration phase</a><span class="exp">From your Kali box, enumerate the domain. Use BloodHound, PowerView, CrackMapExec. Map every attack path BloodHound reveals.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d151"><div class="day-content"><b>D151</b> <a href="https://github.com/GhostPack/Rubeus" target="_blank">Execute: Initial access via Kerberoasting</a><span class="exp">Use Rubeus to extract TGS tickets. Crack them offline with Hashcat. Get a service account credential.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d152"><div class="day-content"><b>D152</b> <a href="https://github.com/gentilkiwi/mimikatz" target="_blank">Execute: Lateral movement</a><span class="exp">Use Mimikatz to dump credentials from a compromised host. Use Pass-the-Hash to move to the next host. Document every step.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d153"><div class="day-content"><b>D153</b> <a href="https://attack.mitre.org/techniques/T1003/" target="_blank">Execute: Privilege escalation to Domain Admin</a><span class="exp">DCSync attack with Mimikatz (lsadump::dcsync). Dump the krbtgt hash. You now own the entire domain.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d154"><div class="day-content"><b>D154</b> <a href="https://www.offsec.com/pentest-report-template/" target="_blank">Deliver: Write the full engagement report</a><span class="exp">10+ page report: executive summary, scope, methodology, technical findings (with screenshots), MITRE ATT&CK mapping, remediation. Portfolio gold.</span></div></label>
+    <div class="week-title">Week 22 · OSCP Exam Preparation</div>
+    <label class="day-item"><input type="checkbox" id="d148"><div class="day-content"><b>D148</b> <a href="https://www.offsec.com/courses/pen-200/" target="_blank">OffSec — PEN-200 (OSCP) Course Overview</a><span class="exp">Read the full syllabus. Identify which topics you're strong in and which need more work. Create a study plan.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d149"><div class="day-content"><b>D149</b> <a href="https://tryhackme.com/room/oscp" target="_blank">TryHackMe — OSCP Preparation</a><span class="exp">Complete this room. Focus on buffer overflow methodology, privilege escalation patterns, and exam tips.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d150"><div class="day-content"><b>D150</b> <a href="https://www.youtube.com/watch?v=UIcLlfnOlKE" target="_blank">IppSec — Buffer Overflow Tutorial</a><span class="exp">Follow IppSec's buffer overflow walkthrough. Replicate on a different vulnerable binary. Document the full exploit chain.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d151"><div class="day-content"><b>D151</b> <a href="https://www.hackthebox.com/" target="_blank">HTB — Practice 3 Medium Machines (Timed)</a><span class="exp">Give yourself 3 hours per machine. Simulate exam conditions: no writeups, no help. Grade yourself honestly.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d152"><div class="day-content"><b>D152</b> <a href="https://www.hackthebox.com/" target="_blank">HTB — Practice 3 More Medium Machines</a><span class="exp">Different machines, same time pressure. Focus on speed: can you get user in under 1 hour?</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d153"><div class="day-content"><b>D153</b> <a href="https://neetcode.io/practice?tab=neetcode150" target="_blank">NeetCode — Full Mock Interview (75 min)</a><span class="exp">Simulate a real interview: 3 problems, increasing difficulty. Have a friend listen if possible.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d154"><div class="day-content"><b>D154</b> <a href="https://www.offsec.com/courses/pen-200/" target="_blank">Review: OSCP exam report template & practice</a><span class="exp">Write a practice OSCP report for one of your HTB machines. Follow OffSec's exact formatting requirements.</span></div></label>
   </div>
 
   <div class="week-group">
-    <div class="week-title">Week 23 · Certifications + Resume</div>
-    <label class="day-item"><input type="checkbox" data-key="d155"><div class="day-content"><b>D155</b> <a href="https://www.professormesser.com/security-plus/sy0-701/sy0-701-video/sy0-701-comptia-security-plus-course/" target="_blank">Professor Messer — CompTIA Security+ SY0-701</a><span class="exp">Watch the first 4 hours of his free course. Take notes on threats, attacks, vulnerabilities. Sec+ is the entry-level industry cert.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d156"><div class="day-content"><b>D156</b> <a href="https://www.professormesser.com/security-plus/sy0-701/sy0-701-video/sy0-701-comptia-security-plus-course/" target="_blank">Professor Messer — Security+ (continued)</a><span class="exp">Watch the next 4 hours. Architecture & Design, Implementation, Operations & Incident Response. Make flashcards.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d157"><div class="day-content"><b>D157</b> <a href="https://www.offsec.com/courses/pen-200/" target="_blank">OffSec — OSCP PEN-200 Syllabus Review</a><span class="exp">Read the syllabus. Decide if OSCP fits your 2027 budget/timeline. Bookmark it as your next cert after this plan ends.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d158"><div class="day-content"><b>D158</b> <a href="https://www.cisa.gov/employment/cyber-resume-tips" target="_blank">CISA — Cybersecurity Resume Guide</a><span class="exp">Build a 1-page resume. Highlight: 4 portfolio projects, HackTheBox rank, TryHackMe paths completed, GitHub repos, labs solved.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d159"><div class="day-content"><b>D159</b> <a href="https://www.linkedin.com/" target="_blank">LinkedIn — Profile Optimization</a><span class="exp">Rewrite your headline ("Cyber Security Analyst | Pentester | Sec+ in progress"). Add 5 skills. Pin your capstone project to your Featured section.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d160"><div class="day-content"><b>D160</b> <a href="https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-github-profile/customizing-your-profile" target="_blank">GitHub — Portfolio Profile README</a><span class="exp">Create a profile README. List your skills, link your top 4 repos, add screenshots. Recruiters WILL look at this.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d161"><div class="day-content"><b>D161</b> <a href="https://www.examcompass.com/comptia/security-plus-practice-test-1" target="_blank">Review: Take a Security+ practice exam</a><span class="exp">Take a free Sec+ practice test. Score 85%+ before booking the real exam. Schedule it 2 weeks out.</span></div></label>
+    <div class="week-title">Week 23 · Capstone Project (Part 1)</div>
+    <label class="day-item"><input type="checkbox" id="d155"><div class="day-content"><b>D155</b> <a href="https://www.vulnhub.com/" target="_blank">VulnHub — Download & Set Up Target VMs</a><span class="exp">Download 2-3 VulnHub machines. Set up an isolated network. Document your attack plan before touching a single tool.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d156"><div class="day-content"><b>D156</b> Capstone: Reconnaissance Phase</a><span class="exp">Full passive + active recon on your targets. Subdomain enum, port scanning, service fingerprinting. Document everything.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d157"><div class="day-content"><b>D157</b> Capstone: Vulnerability Identification</a><span class="exp">Run Nmap NSE, Nessus, Nuclei. Cross-reference findings. Prioritize by CVSS and exploitability.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d158"><div class="day-content"><b>D158</b> Capstone: Exploitation Phase</a><span class="exp">Exploit every finding. Document each step: payload, command, result. If something fails, document why.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d159"><div class="day-content"><b>D159</b> Capstone: Post-Exploitation & Privesc</a><span class="exp">Escalate to root/admin on every target. Demonstrate lateral movement between machines if possible.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d160"><div class="day-content"><b>D160</b> <a href="https://neetcode.io/practice?tab=neetcode150" target="_blank">NeetCode — Final Review Session</a><span class="exp">Re-solve 10 problems from your weakest categories. You should be able to solve Easy in 5 min, Medium in 15 min.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d161"><div class="day-content"><b>D161</b> Capstone: Report Draft (First Pass)</a><span class="exp">Write the full report: executive summary, scope, methodology, findings table, detailed findings, remediation, appendix.</span></div></label>
   </div>
 
   <div class="week-group">
-    <div class="week-title">Week 24 · Mock Interviews + Job Applications</div>
-    <label class="day-item"><input type="checkbox" data-key="d162"><div class="day-content"><b>D162</b> <a href="https://www.techinterviewhandbook.org/behavioral-interview-questions/" target="_blank">Tech Interview Handbook — Behavioral Questions</a><span class="exp">Prepare 5 STAR-format stories: a tough bug, a project you led, a conflict, a failure, a moment of impact. Practice out loud.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d163"><div class="day-content"><b>D163</b> <a href="https://github.com/karltonneal/cybersecurity-interview-questions" target="_blank">Cyber Security Technical Interview Questions</a><span class="exp">Drill 30 technical questions across networking, web security, AD, incident response. Practice answering aloud without notes.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d164"><div class="day-content"><b>D164</b> <a href="https://tryhackme.com/route/career-paths" target="_blank">TryHackMe — Career Paths & Mock Scenario</a><span class="exp">Run through one full SOC analyst scenario and one pentest scenario. Treat it like a real interview technical screen.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d165"><div class="day-content"><b>D165</b> <a href="https://www.cyberseek.org/jobs.html" target="_blank">CyberSeek — Apply to 10 jobs</a><span class="exp">Apply to 10 roles: SOC Analyst L1, Junior Pentester, Security Engineer, Application Security Analyst. Customize cover letter for each.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d166"><div class="day-content"><b>D166</b> <a href="https://www.indeed.com/q-Cyber-Security-jobs.html" target="_blank">Apply to 10 more jobs (Indeed)</a><span class="exp">Apply to 10 more roles. Track each application in a spreadsheet: company, role, date applied, status, follow-up date.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d167"><div class="day-content"><b>D167</b> <a href="https://hackerone.com/opportunities" target="_blank">Apply to 10 more jobs + start a bug bounty</a><span class="exp">Apply to 10 more jobs. Sign up on HackerOne. Submit your first bug bounty report — even if it's a duplicate, the practice matters.</span></div></label>
-    <label class="day-item"><input type="checkbox" data-key="d168"><div class="day-content"><b>D168</b> <a href="https://www.hackthebox.com/hacker/hacker101" target="_blank">Final review & celebrate 🎯</a><span class="exp">Take stock: 4 projects, 20+ PortSwigger labs, 5 HackTheBox boxes, 1 AD capstone, 30+ job applications. You did it. Update your resume with everything.</span></div></label>
+    <div class="week-title">Week 24 · Capstone Project (Part 2) & Career Launch</div>
+    <label class="day-item"><input type="checkbox" id="d162"><div class="day-content"><b>D162</b> Capstone: Report Polish & Peer Review</a><span class="exp">Edit for clarity, fix formatting, add screenshots. Have a peer review it and provide feedback. Iterate.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d163"><div class="day-content"><b>D163</b> Portfolio: Set up GitHub Portfolio</a><span class="exp">Create a professional GitHub profile. Organize repos: tools, writeups, reports, scripts. Add a pinned README portfolio.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d164"><div class="day-content"><b>D164</b> Portfolio: Write 3 Detailed Writeups</a><span class="exp">Pick your 3 best HTB/VulnHub machines. Write detailed writeups with screenshots, methodology, and lessons learned.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d165"><div class="day-content"><b>D165</b> Resume: Build Your Security Resume</a><span class="exp">List your projects, certifications (if any), CTF rankings, tools you've mastered. Tailor for junior pentester roles.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d166"><div class="day-content"><b>D166</b> Career: LinkedIn Optimization & Networking</a><span class="exp">Update LinkedIn with keywords (pentest, OSCP, Python, Burp Suite). Join security groups. Engage with posts daily.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d167"><div class="day-content"><b>D167</b> Career: Apply to 10 Positions</a><span class="exp">Junior Pentester, SOC Analyst, Security Engineer, AppSec Analyst. Customize cover letter for each. Track in a spreadsheet.</span></div></label>
+    <label class="day-item"><input type="checkbox" id="d168"><div class="day-content"><b>D168</b> 🎉 GRADUATION — Review Your Journey</a><span class="exp">Re-read your Day 1 notes. Compare who you are now vs who you were then. You've completed 168 days of structured learning. The plan doesn't end here — it's the beginning.</span></div></label>
   </div>
 </div>
 
 <!-- ============ RESOURCES ============ -->
 <div class="phase" id="phase-4">
   <div class="phase-header">
-    <h2>📚 Resource Library</h2>
-    <p>Every free, high-quality resource in one place. Categorized by topic. Bookmark this page — these are the references you'll use for the next 6 months and beyond.</p>
+    <h2>📚 Resources</h2>
+    <p>Curated books, platforms, tools, and communities. Don't hoard resources — use them. Pick one book per phase, one platform as your primary training ground, and one community for questions.</p>
   </div>
 
   <div class="resource-grid">
-    <div class="resource-card"><div class="cat">Languages</div><h3>Real Python</h3><p>Highest-quality free Python tutorials on the web. From basics to advanced async, sockets, and OOP.</p><a href="https://realpython.com/" target="_blank">realpython.com →</a></div>
-    <div class="resource-card"><div class="cat">Languages</div><h3>Bash Scripting Tutorial</h3><p>Ryan's Tutorials — the most practical, beginner-friendly bash guide. Read it cover to cover.</p><a href="https://ryanstutorials.net/bash-scripting-tutorial/" target="_blank">ryanstutorials.net →</a></div>
-    <div class="resource-card"><div class="cat">Languages</div><h3>Learn Microsoft PowerShell</h3><p>Official Microsoft Learn path for PowerShell. Critical for Windows post-exploitation.</p><a href="https://learn.microsoft.com/en-us/powershell/scripting/learn/ps101/00-introduction" target="_blank">learn.microsoft.com →</a></div>
-    <div class="resource-card"><div class="cat">Languages</div><h3>Learn C++</h3><p>The canonical free C/C++ tutorial. Read chapters 1, 6, 7, 11, 12 for the bits relevant to reverse engineering.</p><a href="https://www.learncpp.com/" target="_blank">learncpp.com →</a></div>
-    <div class="resource-card"><div class="cat">Algorithms</div><h3>NeetCode 150</h3><p>The single best free DSA resource. 150 problems mapped to patterns. Do 1 per day for 5 months.</p><a href="https://neetcode.io/practice?tab=neetcode150" target="_blank">neetcode.io →</a></div>
-    <div class="resource-card"><div class="cat">Algorithms</div><h3>LeetCode Top 150</h3><p>The official "Top Interview 150" study plan. Overlaps 80% with NeetCode — pick one and stick with it.</p><a href="https://leetcode.com/studyplan/top-interview-150/" target="_blank">leetcode.com →</a></div>
-    <div class="resource-card"><div class="cat">Linux</div><h3>Linux Journey</h3><p>Structured, gamified Linux learning from absolute beginner to intermediate. Free and ad-free.</p><a href="https://linuxjourney.com/" target="_blank">linuxjourney.com →</a></div>
-    <div class="resource-card"><div class="cat">Linux</div><h3>OverTheWire Bandit</h3><p>The classic Linux security wargame. 34 levels that teach real command-line skills used in pentesting.</p><a href="https://overthewire.org/wargames/bandit/" target="_blank">overthewire.org →</a></div>
-    <div class="resource-card"><div class="cat">Linux</div><h3>MIT Missing Semester</h3><p>MIT's free course on the tools CS students aren't taught but need: shell, Git, debugging, build systems.</p><a href="https://missing.csail.mit.edu/" target="_blank">missing.csail.mit.edu →</a></div>
-    <div class="resource-card"><div class="cat">Networking</div><h3>Professor Messer Network+</h3><p>Free, comprehensive, exam-quality video course on networking. Better than any paid alternative.</p><a href="https://www.professormesser.com/network-plus/n10-008/n10-008-training-course/" target="_blank">professormesser.com →</a></div>
-    <div class="resource-card"><div class="cat">Networking</div><h3>NetworkChuck</h3><p>The most engaging free networking & Linux content on YouTube. Perfect for first exposure to any topic.</p><a href="https://www.youtube.com/@NetworkChuck" target="_blank">youtube.com/@NetworkChuck →</a></div>
-    <div class="resource-card"><div class="cat">Networking</div><h3>PowerCert Animated Videos</h3><p>Crystal-clear animated explanations of every networking protocol. OSI, DNS, TCP/IP, DHCP, ARP.</p><a href="https://www.youtube.com/@PowerCertAnimatedVideos" target="_blank">youtube.com/@PowerCertAnimatedVideos →</a></div>
-    <div class="resource-card"><div class="cat">Core Domain</div><h3>PortSwigger Web Security Academy</h3><p>The single best free web security training on the planet. Created by the makers of Burp Suite. All labs free.</p><a href="https://portswigger.net/web-security/" target="_blank">portswigger.net →</a></div>
-    <div class="resource-card"><div class="cat">Core Domain</div><h3>HackTheBox</h3><p>Hands-on pentesting labs. Real vulnerable machines. Free tier gets Starting Point + 2 active machines.</p><a href="https://www.hackthebox.com/" target="_blank">hackthebox.com →</a></div>
-    <div class="resource-card"><div class="cat">Core Domain</div><h3>TryHackMe</h3><p>Structured learning paths for SOC, Pentest, Red Team. Best for beginners. Free tier is generous.</p><a href="https://tryhackme.com/" target="_blank">tryhackme.com →</a></div>
-    <div class="resource-card"><div class="cat">Core Domain</div><h3>OWASP</h3><p>The Open Worldwide Application Security Project. Top 10, WSTG, Juice Shop. The industry standard.</p><a href="https://owasp.org/" target="_blank">owasp.org →</a></div>
-    <div class="resource-card"><div class="cat">Core Domain</div><h3>MITRE ATT&CK</h3><p>The universal knowledge base of adversary tactics and techniques. Learn it, love it, cite it in every report.</p><a href="https://attack.mitre.org/" target="_blank">attack.mitre.org →</a></div>
-    <div class="resource-card"><div class="cat">Tools</div><h3>Burp Suite</h3><p>The #1 web application security tool. Free Community edition is enough for everything in this plan.</p><a href="https://portswigger.net/burp" target="_blank">portswigger.net/burp →</a></div>
-    <div class="resource-card"><div class="cat">Tools</div><h3>Nmap Reference</h3><p>Official Nmap man page and NSE script docs. Read the man page front-to-back at least once.</p><a href="https://nmap.org/book/man.html" target="_blank">nmap.org →</a></div>
-    <div class="resource-card"><div class="cat">Tools</div><h3>Wireshark User Guide</h3><p>Official Wireshark documentation. The chapter on display filters alone is worth reading twice.</p><a href="https://www.wireshark.org/docs/wsug_html_chunked/" target="_blank">wireshark.org →</a></div>
-    <div class="resource-card"><div class="cat">Tools</div><h3>Metasploit Docs</h3><p>Official Metasploit Framework documentation. Modules, payloads, Meterpreter, post-exploitation.</p><a href="https://docs.metasploit.com/" target="_blank">docs.metasploit.com →</a></div>
-    <div class="resource-card"><div class="cat">Tools</div><h3>BloodHound</h3><p>Six Degrees of Domain Admin. The tool that revolutionized AD attacks. Free and open source.</p><a href="https://github.com/BloodHoundAD/BloodHound" target="_blank">github.com/BloodHoundAD →</a></div>
-    <div class="resource-card"><div class="cat">Tools</div><h3>Ghidra</h3><p>NSA's open-source reverse engineering suite. Free alternative to IDA Pro. Built in Java.</p><a href="https://ghidra-sre.org/" target="_blank">ghidra-sre.org →</a></div>
-    <div class="resource-card"><div class="cat">Tools</div><h3>GTFOBins</h3><p>Unix binaries that can be exploited for privilege escalation. Bookmark this. Consult it on every Linux box.</p><a href="https://gtfobins.github.io/" target="_blank">gtfobins.github.io →</a></div>
-    <div class="resource-card"><div class="cat">Tools</div><h3>LOLBAS</h3><p>The Windows equivalent of GTFOBins. Living-off-the-land binaries attackers abuse on Windows.</p><a href="https://lolbas-project.github.io/" target="_blank">lolbas-project.github.io →</a></div>
-    <div class="resource-card"><div class="cat">Tools</div><h3>HackTricks</h3><p>Encyclopedia of pentesting techniques by Carlos Polop. Updated constantly. The reference you'll use daily.</p><a href="https://book.hacktricks.xyz/" target="_blank">book.hacktricks.xyz →</a></div>
-    <div class="resource-card"><div class="cat">Career</div><h3>Professor Messer Security+</h3><p>Free SY0-701 video course. The most respected free certification prep on the internet.</p><a href="https://www.professormesser.com/security-plus/sy0-701/sy0-701-video/sy0-701-comptia-security-plus-course/" target="_blank">professormesser.com →</a></div>
-    <div class="resource-card"><div class="cat">Career</div><h3>OSCP (OffSec)</h3><p>The most respected hands-on pentest cert. Not free, but worth knowing about — your next goal after this plan.</p><a href="https://www.offsec.com/courses/pen-200/" target="_blank">offsec.com →</a></div>
-    <div class="resource-card"><div class="cat">Career</div><h3>LetsDefend</h3><p>Free SOC analyst simulator. Real alerts, real logs, real triage. Best blue-team practice outside a job.</p><a href="https://letsdefend.io/" target="_blank">letsdefend.io →</a></div>
-    <div class="resource-card"><div class="cat">Career</div><h3>CyberDefenders</h3><p>Blue Team Labs Online. Free SOC, forensics, and threat intel labs. Highly regarded by hiring managers.</p><a href="https://cyberdefenders.org/" target="_blank">cyberdefenders.org →</a></div>
-    <div class="resource-card"><div class="cat">Career</div><h3>Hacker101</h3><p>Free HackerOne training. Learn bug bounty hunting from the platform that runs the bounties.</p><a href="https://www.hacker101.com/" target="_blank">hacker101.com →</a></div>
-    <div class="resource-card"><div class="cat">CTF</div><h3>picoCTF</h3><p>Free beginner CTF by Carnegie Mellon. The best place to get your first CTF wins.</p><a href="https://picoctf.org/" target="_blank">picoctf.org →</a></div>
-    <div class="resource-card"><div class="cat">CTF</div><h3>pwn.college</h3><p>ASU's free exploit development course. Goes from assembly to kernel exploits. World-class.</p><a href="https://pwn.college/" target="_blank">pwn.college →</a></div>
-    <div class="resource-card"><div class="cat">CTF</div><h3>CTFtime</h3><p>Global CTF calendar and writeup archive. Find live competitions and learn from past writeups.</p><a href="https://ctftime.org/" target="_blank">ctftime.org →</a></div>
-    <div class="resource-card"><div class="cat">Crypto</div><h3>Crypto 101</h3><p>Free introductory cryptography book. Reads like a novel. Covers hashing, symmetric, asymmetric crypto.</p><a href="https://crypto101.io/" target="_blank">crypto101.io →</a></div>
-    <div class="resource-card"><div class="cat">Crypto</div><h3>Computerphile</h3><p>University of Nottingham's computer science YouTube channel. Best crypto explanations anywhere.</p><a href="https://www.youtube.com/@Computerphile" target="_blank">youtube.com/@Computerphile →</a></div>
+    <div class="resource-card">
+      <div class="cat">Book</div>
+      <h3>The Web Application Hacker's Handbook</h3>
+      <p>The definitive guide to web app security. Read chapters alongside PortSwigger labs for maximum retention.</p>
+      <a href="https://www.amazon.com/Web-Application-Hackers-Handbook-Exploiting/dp/0470170778" target="_blank">View →</a>
+    </div>
+    <div class="resource-card">
+      <div class="cat">Book</div>
+      <h3>Penetration Testing: A Hands-On Introduction</h3>
+      <p>Georgia Weidman's book walks you through building your own lab and performing real attacks. Perfect for Phase 3.</p>
+      <a href="https://www.nostarch.com/pentesting" target="_blank">View →</a>
+    </div>
+    <div class="resource-card">
+      <div class="cat">Book</div>
+      <h3>RTFM: Red Team Field Manual</h3>
+      <p>Quick-reference for commands. Keep it open on a second monitor during every lab and engagement.</p>
+      <a href="https://www.amazon.com/RTFM-Red-Team-Field-Manual/dp/1544601469" target="_blank">View →</a>
+    </div>
+    <div class="resource-card">
+      <div class="cat">Book</div>
+      <h3>Black Hat Python</h3>
+      <p>Python for hackers. Build network tools, steal credentials, write trojans. Complements Phase 1 Python work.</p>
+      <a href="https://www.nostarch.com/blackhatpython" target="_blank">View →</a>
+    </div>
+    <div class="resource-card">
+      <div class="cat">Platform</div>
+      <h3>HackTheBox</h3>
+      <p>Primary hands-on platform. Start with Starting Point, progress to Easy, then Medium. Aim for 50+ machines by day 168.</p>
+      <a href="https://www.hackthebox.com/" target="_blank">Join →</a>
+    </div>
+    <div class="resource-card">
+      <div class="cat">Platform</div>
+      <h3>TryHackMe</h3>
+      <p>Guided learning paths. Best for structured topic coverage. Complete the Jr Pentester and Offensive Pentesting paths.</p>
+      <a href="https://tryhackme.com/" target="_blank">Join →</a>
+    </div>
+    <div class="resource-card">
+      <div class="cat">Platform</div>
+      <h3>PortSwigger Web Security Academy</h3>
+      <p>Free, world-class web security training. 100+ labs. Complete at least 30 labs across Phases 2 and 3.</p>
+      <a href="https://portswigger.net/web-security" target="_blank">Start →</a>
+    </div>
+    <div class="resource-card">
+      <div class="cat">Platform</div>
+      <h3>OverTheWire Wargames</h3>
+      <p>Perfect for Week 1-2 Linux skills. Progress from Bandit to Natas to Leviathan. Each game teaches a different skill.</p>
+      <a href="https://overthewire.org/wargames/" target="_blank">Play →</a>
+    </div>
+    <div class="resource-card">
+      <div class="cat">Tool</div>
+      <h3>Burp Suite Community</h3>
+      <p>Your primary web testing proxy. Master Proxy, Repeater, Intruder, and Decoder. Every web pentest starts here.</p>
+      <a href="https://portswigger.net/burp" target="_blank">Download →</a>
+    </div>
+    <div class="resource-card">
+      <div class="cat">Tool</div>
+      <h3>Nmap + Ncat</h3>
+      <p>The scanner and the swiss army knife. Learn NSE scripts, timing templates, and service detection. Use daily.</p>
+      <a href="https://nmap.org/" target="_blank">Download →</a>
+    </div>
+    <div class="resource-card">
+      <div class="cat">Tool</div>
+      <h3>Metasploit Framework</h3>
+      <p>Not just for script kiddies. Understand every module you use. Write your own post-exploitation modules in Phase 3.</p>
+      <a href="https://www.metasploit.com/" target="_blank">Download →</a>
+    </div>
+    <div class="resource-card">
+      <div class="cat">Community</div>
+      <h3>r/netsec & r/AskNetsec</h3>
+      <p>Active Reddit communities. Read daily for threat intel, tool releases, and career advice. Ask questions when stuck.</p>
+      <a href="https://www.reddit.com/r/netsec/" target="_blank">Visit →</a>
+    </div>
+    <div class="resource-card">
+      <div class="cat">Community</div>
+      <h3>Discord: HackTheBox Official</h3>
+      <p>Get help on machines, find study partners, join community events. The #help-desk channel is invaluable.</p>
+      <a href="https://www.hackthebox.com/" target="_blank">Join →</a>
+    </div>
+    <div class="resource-card">
+      <div class="cat">Community</div>
+      <h3>CTFtime.org</h3>
+      <p>Track CTF competitions. Start with Jeopardy-style CTFs. Even participating once teaches you more than a week of reading.</p>
+      <a href="https://ctftime.org/" target="_blank">Explore →</a>
+    </div>
   </div>
 </div>
 
 <!-- ============ PROJECTS ============ -->
 <div class="phase" id="phase-5">
   <div class="phase-header">
-    <h2>🚀 Milestone Projects</h2>
-    <p>Four projects that compound on each other. Each one becomes a portfolio piece on your GitHub. Recruiters don't care about certificates as much as they care about repos with real, working code.</p>
+    <h2>🚀 Projects</h2>
+    <p>These projects are your portfolio. Each one demonstrates a different skill to employers. Complete at least 4 of 6 before day 168. All code goes on GitHub with proper READMEs.</p>
   </div>
 
   <div class="project-card">
-    <span class="tag">Phase 1 · Weeks 1–6</span>
-    <h3>Python Recon Toolkit + Kali Homelab</h3>
-    <p class="desc">Set up a virtualized lab and build a modular Python reconnaissance tool that automates everything you've learned.</p>
+    <span class="tag">Python · Networking</span>
+    <h3>Project 1: Custom Network Scanner</h3>
+    <p class="desc">Build a Python CLI tool that performs SYN scans, service detection, and OS fingerprinting. Use Scapy for packet crafting and threading for performance. Output results as JSON and a styled HTML report.</p>
     <div class="deliverables">Deliverables:</div>
-    <ul class="deliverables-list">
-      <li>VirtualBox lab: Kali + Metasploitable 2 with snapshots</li>
-      <li>Python CLI tool with argparse: host discovery, port scan, service enum, banner grab</li>
-      <li>JSON output schema for integration with future tools</li>
-      <li>GitHub repo with README, usage examples, screenshots</li>
+    <ul>
+      <li>Working scanner with argparse CLI</li>
+      <li>SYN scan, connect scan, UDP scan modes</li>
+      <li>Service version detection</li>
+      <li>JSON + HTML report output</li>
+      <li>GitHub repo with README, requirements.txt, tests</li>
     </ul>
-    <div class="proj-check">
-      <input type="checkbox" id="proj1" data-key="proj1">
-      <label for="proj1">Project 1 complete and on GitHub</label>
-    </div>
+    <label class="proj-check"><input type="checkbox" data-proj="p1"><span>Mark as completed</span></label>
   </div>
 
   <div class="project-card">
-    <span class="tag">Phase 2 · Weeks 7–12</span>
-    <h3>Web Vulnerability Scanner + VA Report</h3>
-    <p class="desc">Build a basic web vuln scanner that detects SQLi, XSS, and open redirects. Use it against OWASP Juice Shop. Produce a professional VA report.</p>
+    <span class="tag">Web Security · Automation</span>
+    <h3>Project 2: Automated XSS Fuzzer</h3>
+    <p class="desc">Build a tool that takes a URL, finds all input parameters (via crawling or sitemap), and tests each for reflected XSS using a curated payload list. Integrate with headless browser for DOM-based XSS detection.</p>
     <div class="deliverables">Deliverables:</div>
-    <ul class="deliverables-list">
-      <li>Python scanner: crawls URLs, sends payloads, parses responses</li>
-      <li>Detection rules for 3 vulnerability classes</li>
-      <li>Run against OWASP Juice Shop and document findings</li>
-      <li>10-page VA report: executive summary, methodology, findings, CVSS scores, remediation</li>
+    <ul>
+      <li>Parameter discovery (forms, URL params, headers)</li>
+      <li>Reflected XSS detection with context-aware payloads</li>
+      <li>DOM-based XSS detection via Playwright/Selenium</li>
+      <li>CSV report with payload, parameter, evidence</li>
+      <li>GitHub repo with documentation</li>
     </ul>
-    <div class="proj-check">
-      <input type="checkbox" id="proj2" data-key="proj2">
-      <label for="proj2">Project 2 complete and on GitHub</label>
-    </div>
+    <label class="proj-check"><input type="checkbox" data-proj="p2"><span>Mark as completed</span></label>
   </div>
 
   <div class="project-card">
-    <span class="tag">Phase 3 · Weeks 13–18</span>
-    <h3>Full Black-Box Penetration Test Report</h3>
-    <p class="desc">Complete a HackTheBox Medium-difficulty machine from zero to root, with no walkthrough. Document the full kill chain as a professional pentest report.</p>
+    <span class="tag">AD · Red Team</span>
+    <h3>Project 3: AD Attack Automation Script</h3>
+    <p class="desc">Build a Python script that automates common AD enumeration and attack steps: BloodHound data collection, Kerberoasting, AS-REP Roasting, DCSync detection check, and GPO abuse enumeration. Output a structured report.</p>
     <div class="deliverables">Deliverables:</div>
-    <ul class="deliverables-list">
-      <li>1 HackTheBox Medium box, no hints, time-boxed to 1 day</li>
-      <li>Full nmap + service enumeration notes</li>
-      <li>Initial access exploit documented step-by-step</li>
-      <li>Privilege escalation vector with screenshots</li>
-      <li>15+ page pentest report (PDF) following PTES structure</li>
+    <ul>
+      <li>Automated domain enumeration</li>
+      <li>Kerberoast + AS-REP roast with hashcat integration</li>
+      <li>Privilege escalation path identification</li>
+      <li>MITRE ATT&CK mapping for each technique</li>
+      <li>GitHub repo — mark as private if sensitive</li>
     </ul>
-    <div class="proj-check">
-      <input type="checkbox" id="proj3" data-key="proj3">
-      <label for="proj3">Project 3 complete and on GitHub</label>
-    </div>
+    <label class="proj-check"><input type="checkbox" data-proj="p3"><span>Mark as completed</span></label>
   </div>
 
   <div class="project-card">
-    <span class="tag">Phase 4 · Weeks 19–24</span>
-    <h3>Active Directory Red Team Engagement</h3>
-    <p class="desc">The capstone. Build a 3-machine AD lab, execute a full red team engagement from initial access to Domain Admin, and deliver a report with MITRE ATT&CK mapping.</p>
+    <span class="tag">Blue Team · SIEM</span>
+    <h3>Project 4: Home Lab SOC Dashboard</h3>
+    <p class="desc">Set up ELK stack or Splunk free in your home lab. Ingest logs from your Kali VM, Windows VM, and router. Create dashboards for: failed login attempts, network anomalies, process execution, and file modifications.</p>
     <div class="deliverables">Deliverables:</div>
-    <ul class="deliverables-list">
-      <li>Home lab: 1 Windows Server 2022 DC + 2 Windows 10 clients + Kali attack box</li>
-      <li>Engagement: Kerberoasting → lateral movement → DCSync → Domain Admin</li>
-      <li>Sliver C2 implant deployment and beaconing</li>
-      <li>Full engagement report with MITRE ATT&CK technique mapping</li>
-      <li>15-minute video walkthrough uploaded to YouTube (unlisted is fine)</li>
+    <ul>
+      <li>Working ELK/Splunk stack with 3+ log sources</li>
+      <li>5 detection rules with alerts</li>
+      <li>3 dashboards (overview, auth, network)</li>
+      <li>Writeup: architecture diagram, installation steps, screenshots</li>
     </ul>
-    <div class="proj-check">
-      <input type="checkbox" id="proj4" data-key="proj4">
-      <label for="proj4">Project 4 complete and on GitHub</label>
-    </div>
+    <label class="proj-check"><input type="checkbox" data-proj="p4"><span>Mark as completed</span></label>
+  </div>
+
+  <div class="project-card">
+    <span class="tag">Cloud · DevSecOps</span>
+    <h3>Project 5: AWS Security Assessment Tool</h3>
+    <p class="desc">Build a Python tool using boto3 that audits an AWS account for: public S3 buckets, overly permissive IAM policies, unencrypted EBS volumes, open security groups, and CloudTrail configuration issues.</p>
+    <div class="deliverables">Deliverables:</div>
+    <ul>
+      <li>10+ AWS security checks</li>
+      <li>CSV + HTML report with severity ratings</li>
+      <li>Remediation suggestions for each finding</li>
+      <li>GitHub repo with CI/CD pipeline example</li>
+    </ul>
+    <label class="proj-check"><input type="checkbox" data-proj="p5"><span>Mark as completed</span></label>
+  </div>
+
+  <div class="project-card">
+    <span class="tag">Capstone · Full Engagement</span>
+    <h3>Project 6: End-to-End Pentest Report</h3>
+    <p class="desc">Select 3 VulnHub machines or build your own lab. Conduct a full pentest engagement from scoping to final report. This is the project you show in interviews. Make it look like a real consulting deliverable.</p>
+    <div class="deliverables">Deliverables:</div>
+    <ul>
+      <li>Rules of Engagement document</li>
+      <li>Full pentest report (15+ pages)</li>
+      <li>Executive summary + technical findings</li>
+      <li>CVSS scores, remediation priorities, proof of concepts</li>
+      <li>PDF on GitHub — this is your crown jewel</li>
+    </ul>
+    <label class="proj-check"><input type="checkbox" data-proj="p6"><span>Mark as completed</span></label>
   </div>
 </div>
 
@@ -719,75 +804,296 @@
 <div class="phase" id="phase-6">
   <div class="phase-header">
     <h2>⏰ Daily Routine</h2>
-    <p>This is a 4-hour-per-day commitment for 168 days. That's 672 hours of focused work. The schedule below is non-negotiable. Block these hours on your calendar and defend them like your job depends on it — because it does.</p>
+    <p>This is the schedule that makes 168 days work. It's designed for someone studying 4-6 hours per day. Adjust times to your life, but keep the order: learn → practice → code → review.</p>
   </div>
 
   <div class="routine-grid">
     <div class="routine-card">
-      <h3>📅 Monday–Friday (4 hours daily)</h3>
-      <div class="routine-slot"><span class="time">60 min</span><span class="activity">Theory: watch the day's video / read the day's docs. Take handwritten notes.</span></div>
-      <div class="routine-slot"><span class="time">90 min</span><span class="activity">Guided coding: follow along with the lab/tutorial. Don't just watch — type the commands.</span></div>
-      <div class="routine-slot"><span class="time">60 min</span><span class="activity">Project work: apply what you learned to your milestone project. No tutorials.</span></div>
-      <div class="routine-slot"><span class="time">30 min</span><span class="activity">Algorithms drill: 1 NeetCode problem. Review solution even if you solved it.</span></div>
+      <h3>📅 Weekday Schedule</h3>
+      <div class="routine-slot"><span class="time">07:00</span><span class="activity">Wake up, exercise, shower</span></div>
+      <div class="routine-slot"><span class="time">08:00</span><span class="activity">Block 1: New concept (video/course/reading) — 90 min</span></div>
+      <div class="routine-slot"><span class="time">09:30</span><span class="activity">Break — 15 min</span></div>
+      <div class="routine-slot"><span class="time">09:45</span><span class="activity">Block 2: Hands-on lab (HTB/THM/PortSwigger) — 90 min</span></div>
+      <div class="routine-slot"><span class="time">11:15</span><span class="activity">Break — 30 min</span></div>
+      <div class="routine-slot"><span class="time">11:45</span><span class="activity">Block 3: Build/code (tool, script, project) — 60 min</span></div>
+      <div class="routine-slot"><span class="time">12:45</span><span class="activity">Lunch & rest</span></div>
+      <div class="routine-slot"><span class="time">14:00</span><span class="activity">Block 4: NeetCode / Interview prep — 45 min</span></div>
+      <div class="routine-slot"><span class="time">14:45</span><span class="activity">Block 5: Review & notes — 30 min</span></div>
+      <div class="routine-slot"><span class="time">15:15</span><span class="activity">Day complete. Log progress.</span></div>
     </div>
-
     <div class="routine-card">
-      <h3>🗓️ Saturday (Deep Work)</h3>
-      <div class="routine-slot"><span class="time">4–6 hrs</span><span class="activity">One block of focused work on the weekly project milestone. No interruptions. No social media.</span></div>
-      <div class="routine-slot"><span class="time">30 min</span><span class="activity">End-of-day review: what did you build? What broke? What did you learn? Write it down.</span></div>
-      <div class="routine-slot"><span class="time">—</span><span class="activity">Push commit to GitHub even if it's WIP. Maintain the green-square streak.</span></div>
-    </div>
-
-    <div class="routine-card">
-      <h3>🗓️ Sunday (Review & Rest)</h3>
-      <div class="routine-slot"><span class="time">60 min</span><span class="activity">Review the week's notes. Update your portfolio. Plan the next week on paper.</span></div>
-      <div class="routine-slot"><span class="time">60 min</span><span class="activity">Re-do 1 algorithm problem from earlier in the week to verify retention.</span></div>
-      <div class="routine-slot"><span class="time">Rest</span><span class="activity">Mental recovery is part of the process. Burnout is the enemy. Step away from the screen.</span></div>
-    </div>
-
-    <div class="routine-card">
-      <h3>🛡️ Non-Negotiable Habits</h3>
-      <p style="color:var(--muted);font-size:13px;margin-bottom:12px">Tick these daily. They protect the cognitive capital you need to learn.</p>
-      <label class="habit-item"><input type="checkbox" data-key="habit1"><div class="habit-text">Sleep 7+ hours<span class="why">Brain consolidates learning during deep sleep. No sleep = no learning.</span></div></label>
-      <label class="habit-item"><input type="checkbox" data-key="habit2"><div class="habit-text">Code or study daily — even 30 min on rest days<span class="why">Momentum compounds. A skipped day becomes a skipped week.</span></div></label>
-      <label class="habit-item"><input type="checkbox" data-key="habit3"><div class="habit-text">Handwritten notes for every concept<span class="why">Studies show handwriting beats typing for retention. Buy a notebook.</span></div></label>
-      <label class="habit-item"><input type="checkbox" data-key="habit4"><div class="habit-text">No social media during study blocks<span class="why">One notification destroys 20 minutes of focus recovery. Airplane mode.</span></div></label>
-      <label class="habit-item"><input type="checkbox" data-key="habit5"><div class="habit-text">Drink 2L of water daily<span class="why">Dehydration measurably impairs cognitive performance.</span></div></label>
-      <label class="habit-item"><input type="checkbox" data-key="habit6"><div class="habit-text">30 minutes of physical exercise<span class="why">Exercise increases BDNF — literally fertilizer for your brain.</span></div></label>
-      <label class="habit-item"><input type="checkbox" data-key="habit7"><div class="habit-text">Reflect on one new thing learned each day<span class="why">Write it in 2 sentences at the end of every session. Compound interest for your mind.</span></div></label>
+      <h3>📅 Weekend Schedule</h3>
+      <div class="routine-slot"><span class="time">09:00</span><span class="activity">Deep work: Full HTB machine or CTF — 3 hours</span></div>
+      <div class="routine-slot"><span class="time">12:00</span><span class="activity">Lunch break</span></div>
+      <div class="routine-slot"><span class="time">13:00</span><span class="activity">Project work (portfolio) — 2 hours</span></div>
+      <div class="routine-slot"><span class="time">15:00</span><span class="activity">Break</span></div>
+      <div class="routine-slot"><span class="time">15:30</span><span class="activity">Community: Read r/netsec, help others on Discord — 30 min</span></div>
+      <div class="routine-slot"><span class="time">16:00</span><span class="activity">Weekly review: What worked? What didn't? Adjust next week.</span></div>
+      <div class="routine-slot"><span class="time">16:30</span><span class="activity">Free time — you earned it</span></div>
     </div>
   </div>
+
+  <h3 style="color:var(--nv);font-size:18px;margin-bottom:14px;">🧩 Daily Habits Tracker</h3>
+  <label class="habit-item"><input type="checkbox" data-habit="h1"><div class="habit-text">No social media before noon<span class="why">Protect your peak cognitive hours for deep learning</span></div></label>
+  <label class="habit-item"><input type="checkbox" data-habit="h2"><div class="habit-text">Write handwritten notes during videos<span class="why">Retention is 3x higher with handwritten notes vs typing</span></div></label>
+  <label class="habit-item"><input type="checkbox" data-habit="h3"><div class="habit-text">Commit at least one git push per day<span class="why">Builds a visible GitHub streak and forces daily output</span></div></label>
+  <label class="habit-item"><input type="checkbox" data-habit="h4"><div class="habit-text">Read 1 r/netsec post and 1 security blog post<span class="why">Stay current with threat landscape — 10 min investment</span></div></label>
+  <label class="habit-item"><input type="checkbox" data-habit="h5"><div class="habit-text">Exercise for 30 minutes<span class="exp">Physical fitness directly impacts cognitive performance and stress management</span></div></label>
+  <label class="habit-item"><input type="checkbox" data-habit="h6"><div class="habit-text">Sleep 7-8 hours<span class="why">Sleep is when your brain consolidates learning. Skip this and you waste the day's effort.</span></div></label>
 </div>
 
 <!-- ============ LEARNING PATH ============ -->
 <div class="phase" id="phase-7">
   <div class="phase-header">
-    <h2>🧠 Learning Path & Depth Guide</h2>
-    <p>Why each skill, and exactly how deep to go. Cybersecurity is too broad to master everything — these are the depths that produce employable skill without wasted effort.</p>
+    <h2>🧠 Learning Path & Career Roadmap</h2>
+    <p>This is your long-term vision beyond day 168. The 24-week plan gets you job-ready. This roadmap takes you from junior to expert over 3-5 years. Each level builds on the last.</p>
   </div>
 
   <div class="lp-section">
-    <h3>Programming & Systems</h3>
-    <label class="lp-item"><input type="checkbox" data-key="lp1"><div class="lp-content"><b>Python</b><span class="why">Why: 90% of pentest tools, exploits, and automation scripts are Python. Why Python specifically? Massive standard library, socket module, and the entire infosec ecosystem (Impacket, Scapy, pwntools) is Python.</span><span class="depth">Depth: OOP, sockets, requests, threading, subprocess, argparse, Scapy. Don't become a web dev — become a tool builder.</span></div></label>
-    <label class="lp-item"><input type="checkbox" data-key="lp2"><div class="lp-content"><b>Bash Scripting</b><span class="why">Why: Linux is the dominant pentest OS. Bash automates enumeration, recon, and post-exploitation. Every senior pentester has a ~/scripts folder.</span><span class="depth">Depth: Variables, conditionals, loops, functions, pipes, redirects, command substitution, exit codes. Don't write production shell scripts — write 50-line one-offs.</span></div></label>
-    <label class="lp-item"><input type="checkbox" data-key="lp3"><div class="lp-content"><b>PowerShell</b><span class="why">Why: Windows post-exploitation runs on PowerShell. PowerSploit, PowerView, BloodHound's ingestor — all PowerShell. Modern Windows shops defend with PowerShell logging; you must understand what they're seeing.</span><span class="depth">Depth: Cmdlets, pipelines, AD module, PowerView, execution policy bypass, AMSI. Don't become a Windows admin — become a Windows attacker.</span></div></label>
-    <label class="lp-item"><input type="checkbox" data-key="lp4"><div class="lp-content"><b>C & x86 Assembly</b><span class="why">Why: Reverse engineering, exploit development, and malware analysis all require reading C and understanding memory layout. Pointers, the stack, the heap — these aren't optional for advanced security work.</span><span class="depth">Depth: Pointers, structs, malloc/free, buffer overflows, basic x86 registers and instructions. Don't write C applications — read and break them.</span></div></label>
-    <label class="lp-item"><input type="checkbox" data-key="lp5"><div class="lp-content"><b>Linux Internals</b><span class="why">Why: 90% of pentest targets run Linux. You can't escalate privileges on a system you don't understand. Permissions, processes, services, file descriptors — all of it matters.</span><span class="depth">Depth: Filesystem hierarchy, permissions (including sticky/setuid/setgid), processes, services (systemd), networking (ip, ss), logging (/var/log).</span></div></label>
-    <label class="lp-item"><input type="checkbox" data-key="lp6"><div class="lp-content"><b>Windows Internals</b><span class="why">Why: Active Directory runs 90% of enterprise environments. AD attacks (Kerberoasting, DCSync, Pass-the-Hash) require understanding Windows authentication, the registry, services, and LSASS.</span><span class="depth">Depth: Registry, services, processes, tokens, Kerberos, NTLM, LSASS, Active Directory structure (forests, domains, OUs, GPOs, trusts).</span></div></label>
-    <label class="lp-item"><input type="checkbox" data-key="lp7"><div class="lp-content"><b>Networking</b><span class="why">Why: Every attack traverses a network. You can't pentest what you can't sniff, scan, or route. Subnetting, DNS, TCP handshakes, NAT — these are the substrate of every engagement.</span><span class="depth">Depth: OSI model, TCP/IP, subnetting (by hand), DNS, DHCP, HTTP/HTTPS, common ports and protocols. Be able to read a Wireshark capture cold.</span></div></label>
+    <h3>Level 1 → Junior Security Analyst / SOC Analyst (0-1 year)</h3>
+    <label class="lp-item"><input type="checkbox" data-lp="l1"><div class="lp-content"><b>Complete this 24-week plan</b><span class="why">This is the foundation everything else builds on</span><span class="depth">168 days · All phases</span></div></label>
+    <label class="lp-item"><input type="checkbox" data-lp="l2"><div class="lp-content"><b>Get CompTIA Security+ (optional but helpful for HR filters)</b><span class="why">Many job postings require or prefer it. Takes 2-4 weeks of study if you've completed this plan.</span><span class="depth">2-4 weeks · SY0-701</span></div></label>
+    <label class="lp-item"><input type="checkbox" data-lp="l3"><div class="lp-content"><b>Apply for SOC Analyst / Junior Security Engineer roles</b><span class="why">Target companies with security teams of 5+ people — you'll get mentorship</span><span class="depth">Ongoing · 50+ applications</span></div></label>
+    <label class="lp-item"><input type="checkbox" data-lp="l4"><div class="lp-content"><b>Continue HTB: 100 machines pwned</b><span class="why">Consistency beats intensity. 2 machines per week after the plan ends.</span><span class="depth">Ongoing · HTB</span></div></label>
   </div>
 
   <div class="lp-section">
-    <h3>Core Cyber Security Domain</h3>
-    <label class="lp-item"><input type="checkbox" data-key="lp8"><div class="lp-content"><b>Web Application Security</b><span class="why">Why: Web apps are the most exposed attack surface on the internet. Bug bounties pay here. Pentests pay here. SOC analysts triage web alerts here. There's no version of cyber security where this isn't valuable.</span><span class="depth">Depth: OWASP Top 10, manual testing with Burp Suite (Repeater, Intruder), 50+ PortSwigger labs solved, JWT attacks, SSTI, SSRF, IDOR.</span></div></label>
-    <label class="lp-item"><input type="checkbox" data-key="lp9"><div class="lp-content"><b>Network Penetration Testing</b><span class="why">Why: External and internal network assessments are the bread-and-butter of every consulting firm. "Can you hack our network?" is the most common engagement type.</span><span class="depth">Depth: Nmap mastery, service-specific exploitation (SMB, FTP, SNMP, SSH, HTTP), Metasploit, pivoting, complete HTB easy/medium boxes solo.</span></div></label>
-    <label class="lp-item"><input type="checkbox" data-key="lp10"><div class="lp-content"><b>Cryptography</b><span class="why">Why: TLS, hashes, certificates, password storage — every security decision touches crypto. You don't need to be a mathematician, but you must spot broken implementations.</span><span class="depth">Depth: Symmetric vs asymmetric, hashing vs encryption, AES modes, RSA basics, TLS handshake, common attacks (small-e, padding oracle, hash collision).</span></div></label>
-    <label class="lp-item"><input type="checkbox" data-key="lp11"><div class="lp-content"><b>Active Directory Attacks</b><span class="why">Why: Every enterprise pentest includes AD. Kerberoasting, AS-REP Roasting, Pass-the-Hash, Pass-the-Ticket, DCSync, Golden Tickets — these are the techniques that get you Domain Admin.</span><span class="depth">Depth: BloodHound analysis, Mimikatz, Rubeus, Impacket suite, full kill chain from user to DA. Be able to execute this in your sleep.</span></div></label>
-    <label class="lp-item"><input type="checkbox" data-key="lp12"><div class="lp-content"><b>Reverse Engineering & Exploit Dev</b><span class="why">Why: Advanced security research, vulnerability discovery, and 0-day analysis all require RE. This is the path to senior research roles. Not every pentester needs this — but the best ones do.</span><span class="depth">Depth: Ghidra/radare2 proficiency, x86 assembly reading, stack-based buffer overflows, basic ROP, pwntools. Don't aim for kernel exploits — aim for CTF-level binary exploitation.</span></div></label>
-    <label class="lp-item"><input type="checkbox" data-key="lp13"><div class="lp-content"><b>Cloud Security</b><span class="why">Why: Modern infrastructure is cloud. AWS, Azure, GCP — every enterprise has at least one. Cloud attack patterns (IAM abuse, S3 misconfig, SSRF-to-metadata) are different from on-prem.</span><span class="depth">Depth: AWS IAM, S3, STS, Lambda. Azure AD / Entra ID. Tooling: Pacu, ScoutSuite, Prowler. Be able to assess an AWS environment end-to-end.</span></div></label>
-    <label class="lp-item"><input type="checkbox" data-key="lp14"><div class="lp-content"><b>SOC, SIEM & Blue Team</b><span class="why">Why: Understanding defense makes you a better attacker. Many security careers start in the SOC. Knowing how alerts are generated tells you what to evade and what gets you caught.</span><span class="depth">Depth: Splunk SPL queries, MITRE ATT&CK mapping, incident response lifecycle, log analysis (Windows Event Logs, Syslog, PCAP), LetsDefend scenarios.</span></div></label>
-    <label class="lp-item"><input type="checkbox" data-key="lp15"><div class="lp-content"><b>Privilege Escalation</b><span class="why">Why: Getting initial access is half the battle. The other half is becoming root/admin. Privesc is where junior pentests stall — and where seniors shine.</span><span class="depth">Depth: Linux (sudo, SUID, kernel, cron, PATH, capabilities), Windows (services, registry, token impersonation, UAC bypass). Run LinPEAS/WinPEAS on every box.</span></div></label>
+    <h3>Level 2 → Penetration Tester (1-2 years)</h3>
+    <label class="lp-item"><input type="checkbox" data-lp="l5"><div class="lp-content"><b>Earn OSCP (PEN-200)</b><span class="why">The gold standard for penetration testing. Most consulting firms require it.</span><span class="depth">2-3 months · OffSec</span></div></label>
+    <label class="lp-item"><input type="checkbox" data-lp="l6"><div class="lp-content"><b>Start a bug bounty program (HackerOne / Bugcrowd)</b><span class="why">Real-world targets, real money. Even one valid bug proves you can hack outside a lab.</span><span class="depth">Ongoing · HackerOne</span></div></label>
+    <label class="lp-item"><input type="checkbox" data-lp="l7"><div class="lp-content"><b>Specialize: Web App Pentest or Infrastructure Pentest</b><span class="why">Generalists get hired; specialists get promoted. Pick based on what you enjoyed most in Phases 2-3.</span><span class="depth">6-12 months focus</span></div></label>
+    <label class="lp-item"><input type="checkbox" data-lp="l8"><div class="lp-content"><b>Earn OSEP (PEN-300) or CRTP for AD focus</b><span class="why">Advanced certification that differentiates you from other OSCP holders</span><span class="depth">2-3 months · OffSec</span></div></label>
+  </div>
+
+  <div class="lp-section">
+    <h3>Level 3 → Senior Pentester / Red Teamer (2-4 years)</h3>
+    <label class="lp-item"><input type="checkbox" data-lp="l9"><div class="lp-content"><b>Lead pentest engagements end-to-end</b><span class="why">Scoping, pricing, execution, reporting, debrief. This is consulting, not just hacking.</span><span class="depth">On-the-job · 1-2 years</span></div></label>
+    <label class="lp-item"><input type="checkbox" data-lp="l10"><div class="lp-content"><b>Develop custom tools and release them open-source</b><span class="why">A popular GitHub repo is worth more than any certification for senior roles</span><span class="depth">Ongoing · GitHub</span></div></label>
+    <label class="lp-item"><input type="checkbox" data-lp="l11"><div class="lp-content"><b>Speak at a local security meetup or conference</b><span class="why">Teaching solidifies knowledge and builds your professional reputation</span><span class="depth">1-2 talks per year</span></div></label>
+    <label class="lp-item"><input type="checkbox" data-lp="l12"><div class="lp-content"><b>Earn OSED / OSEE for exploit development</b><span class="why">The hardest OffSec certs. Few people have them. This puts you in the top 1%.</span><span class="depth">3-6 months each · OffSec</span></div></label>
+  </div>
+
+  <div class="lp-section">
+    <h3>Level 4 → Security Architect / Principal Engineer (4+ years)</h3>
+    <label class="lp-item"><input type="checkbox" data-lp="l13"><div class="lp-content"><b>Design security programs for organizations</b><span class="why">Move from breaking things to building secure things. The highest-impact security work.</span><span class="depth">On-the-job · Leadership</span></div></label>
+    <label class="lp-item"><input type="checkbox" data-lp="l14"><div class="lp-content"><b>Mentor junior analysts and pentesters</b><span class="why">Teaching is the fastest way to deepen your own understanding</span><span class="depth">Ongoing · Mentorship</span></div></label>
+    <label class="lp-item"><input type="checkbox" data-lp="l15"><div class="lp-content"><b>Publish research or CVEs</b><span class="why">Finding a 0-day or publishing novel research establishes you as an expert, not just a practitioner</span><span class="depth">Ongoing · Research</span></div></label>
+    <label class="lp-item"><input type="checkbox" data-lp="l16"><div class="lp-content"><b>CISSP for management-track roles</b><span class="why">Required for CISO-track. Take it when you have 5+ years of experience for the endorsement requirement.</span><span class="depth">2-3 months · (ISC)²</span></div></label>
   </div>
 </div>
+
+</main>
+</div><!-- end .main-wrap -->
+
+<footer>
+  <div class="container">
+    <p>Cyber Security Expert Master Plan · Built for focus, not comfort · 168 days to transformation</p>
+  </div>
+</footer>
+
+<script>
+(function() {
+  'use strict';
+
+  var TOTAL_DAYS = 168;
+  var STORAGE_KEY = 'cyber-plan-v2';
+
+  /* ── Tab Switching ── */
+  var tabs = document.querySelectorAll('.tab');
+  var phases = document.querySelectorAll('.phase');
+
+  tabs.forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      var idx = parseInt(this.getAttribute('data-phase'), 10);
+      tabs.forEach(function(t) { t.classList.remove('active'); });
+      phases.forEach(function(p) { p.classList.remove('active'); });
+      this.classList.add('active');
+      var target = document.getElementById('phase-' + idx);
+      if (target) target.classList.add('active');
+    });
+  });
+
+  /* ── Progress Tracking ── */
+  function getCheckedDays() {
+    var checked = [];
+    for (var i = 1; i <= TOTAL_DAYS; i++) {
+      var cb = document.getElementById('d' + i);
+      if (cb && cb.checked) checked.push(i);
+    }
+    return checked;
+  }
+
+  function updateProgress() {
+    var checked = getCheckedDays();
+    var pct = (checked.length / TOTAL_DAYS * 100).toFixed(1);
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('progress-count').textContent = checked.length + ' / ' + TOTAL_DAYS + ' days completed';
+    saveState();
+  }
+
+  /* ── Day Checkbox Handler ── */
+  document.addEventListener('change', function(e) {
+    if (e.target.type === 'checkbox' && e.target.id && e.target.id.indexOf('d') === 0) {
+      var item = e.target.closest('.day-item');
+      if (item) {
+        if (e.target.checked) {
+          item.classList.add('done');
+        } else {
+          item.classList.remove('done');
+        }
+      }
+      updateProgress();
+    }
+    // Habit checkboxes
+    if (e.target.type === 'checkbox' && e.target.hasAttribute('data-habit')) {
+      var habitItem = e.target.closest('.habit-item');
+      if (habitItem) {
+        habitItem.classList.toggle('done', e.target.checked);
+      }
+      saveState();
+    }
+    // Learning path checkboxes
+    if (e.target.type === 'checkbox' && e.target.hasAttribute('data-lp')) {
+      var lpItem = e.target.closest('.lp-item');
+      if (lpItem) {
+        lpItem.classList.toggle('done', e.target.checked);
+      }
+      saveState();
+    }
+    // Project checkboxes
+    if (e.target.type === 'checkbox' && e.target.hasAttribute('data-proj')) {
+      saveState();
+    }
+  });
+
+  /* ── Reset ── */
+  document.getElementById('reset-btn').addEventListener('click', function() {
+    if (!confirm('Reset all progress? This cannot be undone.')) return;
+    localStorage.removeItem(STORAGE_KEY);
+    for (var i = 1; i <= TOTAL_DAYS; i++) {
+      var cb = document.getElementById('d' + i);
+      if (cb) {
+        cb.checked = false;
+        var item = cb.closest('.day-item');
+        if (item) item.classList.remove('done');
+      }
+    }
+    // Reset habits
+    document.querySelectorAll('.habit-item').forEach(function(h) {
+      h.classList.remove('done');
+      var cb = h.querySelector('input[type="checkbox"]');
+      if (cb) cb.checked = false;
+    });
+    // Reset LP
+    document.querySelectorAll('.lp-item').forEach(function(l) {
+      l.classList.remove('done');
+      var cb = l.querySelector('input[type="checkbox"]');
+      if (cb) cb.checked = false;
+    });
+    // Reset projects
+    document.querySelectorAll('[data-proj]').forEach(function(p) {
+      p.checked = false;
+    });
+    updateProgress();
+  });
+
+  /* ── Persistence ── */
+  function saveState() {
+    var state = {
+      days: getCheckedDays(),
+      habits: [],
+      lp: [],
+      proj: []
+    };
+    document.querySelectorAll('[data-habit]').forEach(function(cb) {
+      if (cb.checked) state.habits.push(cb.getAttribute('data-habit'));
+    });
+    document.querySelectorAll('[data-lp]').forEach(function(cb) {
+      if (cb.checked) state.lp.push(cb.getAttribute('data-lp'));
+    });
+    document.querySelectorAll('[data-proj]').forEach(function(cb) {
+      if (cb.checked) state.proj.push(cb.getAttribute('data-proj'));
+    });
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch(e) {}
+  }
+
+  function loadState() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      var state = JSON.parse(raw);
+
+      if (state.days && Array.isArray(state.days)) {
+        state.days.forEach(function(id) {
+          var cb = document.getElementById('d' + id);
+          if (cb) {
+            cb.checked = true;
+            var item = cb.closest('.day-item');
+            if (item) item.classList.add('done');
+          }
+        });
+      }
+      if (state.habits && Array.isArray(state.habits)) {
+        state.habits.forEach(function(key) {
+          var cb = document.querySelector('[data-habit="' + key + '"]');
+          if (cb) {
+            cb.checked = true;
+            var item = cb.closest('.habit-item');
+            if (item) item.classList.add('done');
+          }
+        });
+      }
+      if (state.lp && Array.isArray(state.lp)) {
+        state.lp.forEach(function(key) {
+          var cb = document.querySelector('[data-lp="' + key + '"]');
+          if (cb) {
+            cb.checked = true;
+            var item = cb.closest('.lp-item');
+            if (item) item.classList.add('done');
+          }
+        });
+      }
+      if (state.proj && Array.isArray(state.proj)) {
+        state.proj.forEach(function(key) {
+          var cb = document.querySelector('[data-proj="' + key + '"]');
+          if (cb) cb.checked = true;
+        });
+      }
+    } catch(e) {}
+    updateProgress();
+  }
+
+  /* ── Countdown Timer ── */
+  function updateCountdown() {
+    var target = new Date('2027-03-01T00:00:00').getTime();
+    var now = Date.now();
+    var diff = target - now;
+    var el = document.getElementById('countdown-text');
+
+    if (diff <= 0) {
+      el.innerHTML = '<span class="num">✓</span> Plan completed — you made it!';
+      return;
+    }
+
+    var days = Math.floor(diff / 86400000);
+    var hours = Math.floor((diff % 86400000) / 3600000);
+    var mins = Math.floor((diff % 3600000) / 60000);
+
+    el.innerHTML =
+      '<span class="num">' + days + '</span>d ' +
+      '<span class="num">' + String(hours).padStart(2, '0') + '</span>h ' +
+      '<span class="num">' + String(mins).padStart(2, '0') + '</span>m remaining';
+  }
+
+  /* ── Init ── */
+  loadState();
+  updateCountdown();
+  setInterval(updateCountdown, 30000);
+
+})();
+</script>
+
 </body>
 </html>
